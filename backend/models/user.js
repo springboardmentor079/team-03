@@ -1,10 +1,10 @@
 // models/User.js
 const mongoose = require('mongoose');
-
+const bcrypt = require('bcrypt');
 const userSchema = new mongoose.Schema({
-  name: {
+  fullName: {
     type: String,
-    required: [true, 'Name is required'],
+    required: [true, 'Full name is required'],
     trim: true
   },
   email: {
@@ -16,12 +16,12 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password string is required'] // Stores bcrypt hashed string
+    required: [true, 'Password string is required'] 
   },
   role: {
     type: String,
     required: [true, 'Role type is required for RBAC'],
-    // Enforces the exact project roles from the specifications document[cite: 2]
+   
     enum: ['Administrator', 'Project Manager', 'Site Engineer', 'Contractor', 'Worker', 'Client'],
     default: 'Site Engineer'
   },
@@ -30,5 +30,23 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+// Pre-save hook to hash the password before saving to MongoDB
+userSchema.pre('save', async function(next) {
+  // Only hash the password if it has been modified (or is new)
+  if (!this.isModified('password')) return next();
 
+  try {
+    // Generate a salt and hash the password
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to compare candidate password with the hashed password during Login
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 module.exports = mongoose.model('User', userSchema);

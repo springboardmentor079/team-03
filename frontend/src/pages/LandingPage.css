@@ -1,0 +1,451 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --primary-green: #00c938;
+  --dark-green: #005f19;
+  --bg-dark-gray: #2b2d31;
+  --bg-light-gray: #f8f9fa;
+  --text-white: #ffffff;
+  --text-light-gray: #b5babf;
+  --text-dark: #1e2022;
+  --text-muted: #6c757d;
+  --font-main: 'Outfit', sans-serif;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-premium: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* 1. Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  width: 100%;
+  max-width: 100%;
+  font-family: var(--font-main);
+  background-color: var(--text-white);
+  color: var(--text-dark);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Base Link Reset */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 2. Left Panel (Fixed Sidebar) */
+.left-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 30%;
+  height: 100vh;
+  background: linear-gradient(135deg, var(--dark-green) 0%, var(--primary-green) 100%);
+  color: var(--text-white) !important; /* Strictly white */
+  padding: 4rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* Sidebar Top: Logo */
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Sidebar Middle: Text & H1 */
+.sidebar-content {
+  margin: auto 0;
+}
+
+.sidebar-content h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+  letter-spacing: -1px;
+}
+
+.sidebar-description {
+  font-size: 1rem;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 90%;
+  line-height: 1.6;
+}
+
+/* Sidebar Bottom: Stats Stacked */
+.sidebar-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+  color: var(--text-white);
+  letter-spacing: -0.5px;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* 3. Right Panel (Scrollable Content) */
+.right-panel {
+  width: 70%;
+  margin-left: 30%;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* 4. Right Panel - Top Navbar */
+.top-navbar {
+  position: sticky;
+  top: 0;
+  height: 80px;
+  background-color: var(--bg-dark-gray);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4rem;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.nav-link {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #b9bbbe !important; /* Replaced variable with light gray */
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 0.5rem 0;
+  text-decoration: none;
+}
+
+.nav-link:hover {
+  color: #ffffff !important; /* Replaced variable with pure white */
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-green);
+  transition: var(--transition-smooth);
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.75rem 1.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.btn-signin {
+  background-color: #00c938; 
+  border: 1px solid #00c938;
+  color: #ffffff !important;
+}
+
+.btn-signin:hover {
+  background-color: #00a62e;
+  border-color: #00a62e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 201, 56, 0.3);
+}
+
+.btn-signup {
+  background-color: transparent;
+  border: 2px solid #00c938;
+  color: #00c938 !important;
+}
+
+.btn-signup:hover {
+  background-color: #00c938;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 201, 56, 0.2);
+}
+
+/* 5. Right Panel - Section 1 (Hero / #home) */
+.hero-section {
+  height: calc(100vh - 80px);
+  background: linear-gradient(rgba(20, 20, 20, 0.7), rgba(20, 20, 20, 0.7)),
+              url('https://images.unsplash.com/photo-1508450859948-4e04fabaa4ea?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center / cover;
+  display: flex;
+  align-items: center;
+  padding: 0 5rem;
+  color: var(--text-white);
+  position: relative;
+}
+
+.hero-content {
+  max-width: 650px;
+}
+
+.hero-subtitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary-green);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.hero-title {
+  font-size: 4.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -2px;
+}
+
+.hero-description {
+  font-size: 1.15rem;
+  font-weight: 300;
+  color: var(--text-light-gray);
+  line-height: 1.6;
+}
+
+/* Section Header (Shared style for About & Contact) */
+.section-header {
+  margin-bottom: 3.5rem;
+}
+
+.section-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary-green);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.5px;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 0.75rem;
+}
+
+.green-underline {
+  width: 60px;
+  height: 4px;
+  background-color: var(--primary-green);
+  border-radius: 2px;
+  margin-top: 0.5rem;
+}
+
+/* 6. Right Panel - Section 2 (About / #about) */
+.about-section {
+  padding: 7rem 5rem;
+  background-color: var(--text-white);
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 850px;
+}
+
+.about-text {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.about-text strong {
+  color: var(--text-dark);
+}
+
+/* 7. Right Panel - Section 3 (Contact / #contact) */
+.contact-section {
+  padding: 7rem 5rem;
+  background-color: var(--bg-light-gray);
+}
+
+.contact-grid {
+  display: flex;
+  gap: 2.5rem;
+  width: 100%;
+}
+
+.contact-card {
+  background-color: var(--text-white);
+  flex: 1;
+  padding: 3rem 2.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow-premium);
+  transition: var(--transition-smooth);
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.contact-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(0, 201, 56, 0.15);
+}
+
+.card-icon-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(0, 201, 56, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-green);
+}
+
+.card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.card-description {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.card-link {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-green);
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition-smooth);
+}
+
+.card-link:hover {
+  color: var(--dark-green);
+}
+
+/* Responsive adjustment if screen gets narrower (Tablet-sized responsive stack) */
+@media (max-width: 1024px) {
+  .left-panel {
+    padding: 2.5rem 2rem;
+  }
+  .left-panel h1 {
+    font-size: 2rem;
+  }
+  .top-navbar {
+    padding: 0 2rem;
+  }
+  .hero-section {
+    padding: 0 3rem;
+  }
+  .hero-title {
+    font-size: 3.5rem;
+  }
+  .about-section, .contact-section {
+    padding: 5rem 3rem;
+  }
+  .contact-grid {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+/* Complete Mobile View Switch (Standard split collapse for tiny layouts, if required, although strictly keeping 30/70 is requested. We keep the layout percentage clean) */
+@media (max-width: 768px) {
+  /* Under 768px we still enforce split structure, but adjust margins & sizes to look professional */
+  .left-panel h1 {
+    font-size: 1.6rem;
+  }
+  .hero-title {
+    font-size: 2.8rem;
+  }
+  .nav-links {
+    gap: 1.2rem;
+  }
+  .btn {
+    padding: 0.5rem 1rem;
+  }
+}
