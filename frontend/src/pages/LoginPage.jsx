@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -11,12 +12,15 @@ const LoginPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Login submitted:', formData);
-    // TODO: Add Axios POST request to /api/auth/login here
-    // If successful, save JWT and navigate to dashboard
-  };
+const handleSubmit = (e) => {
+  e.preventDefault();
+  
+  // Log the form data to the console for your own testing
+  console.log('Login submitted:', formData);
+  
+  // Route the user directly to the new dashboard page
+  navigate('/dashboard'); 
+};
 
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center bg-light">
@@ -35,10 +39,10 @@ const LoginPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              required 
+              /* 'required' has been removed from here */
             />
           </div>
-          
+          ``
           <div className="mb-4">
             <label className="form-label fw-semibold">Password</label>
             <input 
@@ -47,7 +51,7 @@ const LoginPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              required 
+              /* 'required' has been removed from here */
             />
           </div>
 
