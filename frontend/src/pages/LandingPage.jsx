@@ -110,7 +110,7 @@ export default function LandingPage() {
           {/* Flexbox grid containing two white contact cards */}
           <div className="contact-grid">
             
-            {/* Phone Card */}
+            
             <div className="contact-card" id="contact-card-phone">
               <div className="card-icon-container">
                 <svg
@@ -137,7 +137,7 @@ export default function LandingPage() {
               </a>
             </div>
 
-            {/* Email Card */}
+            
             <div className="contact-card" id="contact-card-email">
               <div className="card-icon-container">
                 <svg
