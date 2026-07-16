@@ -1,14 +1,57 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/auth'; // Ensure this matches your context file path
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [hoverLink, setHoverLink] = useState(false);
 
-  const handleSubmit = (e) => {
+  // Initialize context and navigation
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert(`Logged in with email: ${email}`);
+    
+    try {
+      // ==========================================
+      // REAL BACKEND CONNECTION (Commented out for now)
+      // ==========================================
+      // const response = await axios.post('http://localhost:5000/api/users/login', {
+      //   email,
+      //   password
+      // });
+      // const { token, user } = response.data;
+      // localStorage.setItem('token', token);
+      // login(user);
+      
+      // ==========================================
+      // SIMULATED LOGIN (Active for frontend testing)
+      // ==========================================
+      const dummyUser = { 
+        name: 'Sasimaran', 
+        email: email, 
+        role: 'Admin' // Change this to 'Project Manager', 'Site Engineer', etc. to test different views
+      };
+      
+      login(dummyUser); 
+      
+      // Redirect the user to their protected dashboard based on role
+      if (dummyUser.role === 'Admin') {
+        navigate('/dashboard/admin');
+      } else if (dummyUser.role === 'Project Manager') {
+        navigate('/dashboard/pm');
+      } else if (dummyUser.role === 'Site Engineer') {
+        navigate('/dashboard/engineer');
+      } else {
+        navigate('/dashboard'); // Fallback route
+      }
+      
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert(error.response?.data?.message || "An error occurred during login");
+    }
   };
 
   return (
@@ -41,7 +84,7 @@ const Login = () => {
             <input
               type="email"
               required
-              placeholder="e.g. john@example.com"
+              placeholder="e.g. sasimaran@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={{
