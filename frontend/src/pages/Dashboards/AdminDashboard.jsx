@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './AdminDashboard.css';
 
 function AdminDashboard() {
@@ -249,8 +250,8 @@ function AdminDashboard() {
                     zIndex: 100,
                   }}
                 >
-                  <a
-                    href="#profile"
+                  <Link
+                    to="/dashboard/profile"
                     style={{
                       display: 'block',
                       padding: '10px 16px',
@@ -261,7 +262,7 @@ function AdminDashboard() {
                     onClick={() => setShowProfileMenu(false)}
                   >
                     My Profile
-                  </a>
+                  </Link>
                   <a
                     href="#settings"
                     style={{

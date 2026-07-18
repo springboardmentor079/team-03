@@ -12,6 +12,26 @@ import ContractorDashboard from './pages/Dashboards/ContractorDashboard';
 import WorkerDashboard from './pages/Dashboards/WorkerDasshboard';
 import ClientDashboard from './pages/Dashboards/ClientDashboard';
 
+// Remaining Screens
+import ProjectListing from './pages/Projects/ProjectListing';
+import ProjectDetails from './pages/Projects/ProjectDetails';
+import MilestoneTracking from './pages/Projects/MilestoneTracking';
+import ProjectStatus from './pages/Projects/ProjectStatus';
+import ResourceAllocation from './pages/Resource/ResourceAllocation';
+import EquipmentTracking from './pages/Resource/EquipmentTracking';
+import ResourceUtilization from './pages/Resource/ResourceUtilization';
+import MaterialInventory from './pages/Inventory/MaterialInventory';
+import StockMonitoring from './pages/Inventory/StockMonitory';
+import ProcurementRequest from './pages/Inventory/ProcurementRequest';
+import WorkerManagement from './pages/Workforce/Workermanagement';
+import AttendanceTracking from './pages/Workforce/AttendenceTracking';
+import ShiftScheduling from './pages/Workforce/ShiftScheduling';
+import BudgetAnalytics from './pages/Analytics/BudgetAnalytics';
+import ProjectProgress from './pages/Analytics/ProjectProgress';
+import ResourceAnalytics from './pages/Analytics/ResourceAnalytics';
+import ProcurementAnalytics from './pages/Analytics/ProcurementAnalytics';
+import Profile from './pages/Profile';
+
 function App() {
   return (
     <BrowserRouter>
@@ -63,6 +83,28 @@ function App() {
           {/* Only Clients can access this */}
           <Route element={<ProtectedRoute allowedRoles={['Client']} />}>
             <Route path="client" element={<ClientDashboard />} />
+          </Route>
+
+          {/* General protected routes for all authenticated users */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="profile" element={<Profile />} />
+            <Route path="projects" element={<ProjectListing />} />
+            <Route path="projects/:id" element={<ProjectDetails />} />
+            <Route path="projects/milestones" element={<MilestoneTracking />} />
+            <Route path="projects/status" element={<ProjectStatus />} />
+            <Route path="resources/allocation" element={<ResourceAllocation />} />
+            <Route path="resources/equipment" element={<EquipmentTracking />} />
+            <Route path="resources/utilization" element={<ResourceUtilization />} />
+            <Route path="inventory" element={<MaterialInventory />} />
+            <Route path="inventory/stock" element={<StockMonitoring />} />
+            <Route path="inventory/procurement" element={<ProcurementRequest />} />
+            <Route path="workforce/workers" element={<WorkerManagement />} />
+            <Route path="workforce/attendance" element={<AttendanceTracking />} />
+            <Route path="workforce/shifts" element={<ShiftScheduling />} />
+            <Route path="analytics/budget" element={<BudgetAnalytics />} />
+            <Route path="analytics/progress" element={<ProjectProgress />} />
+            <Route path="analytics/resources" element={<ResourceAnalytics />} />
+            <Route path="analytics/procurement" element={<ProcurementAnalytics />} />
           </Route>
 
         </Route>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 const PasswordReset = () => {
   const [email, setEmail] = useState('');
@@ -7,7 +8,7 @@ const PasswordReset = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
@@ -23,11 +24,14 @@ const PasswordReset = () => {
 
     setIsSubmitting(true);
 
-    // Simulate backend network API delay
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
       setIsSuccess(true);
-    }, 1500);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
