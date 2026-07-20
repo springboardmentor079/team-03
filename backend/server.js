@@ -6,6 +6,7 @@ const cors = require('cors');
 // Import routes
 const userRoutes = require('./routes/user.routes');
 const projectRoutes = require('./routes/project.routes');
+const authRoutes = require('./routes/auth');          // ← added
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.get('/api/status', (req, res) => {
 // Mount API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/auth', authRoutes);                      // ← added
 
 // MongoDB Connection and Server Start
 const PORT = process.env.PORT || 5000;
