@@ -1,26 +1,43 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); // Required to allow React to talk to Express
-require('dotenv').config();
+const cors = require('cors');
+
+// Import routes
+const userRoutes = require('./routes/user.routes');
+const projectRoutes = require('./routes/project.routes');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors()); 
-app.use(express.json()); // Required to parse JSON payloads from frontend forms
+// Standard Middleware
+app.use(express.json());
+app.use(cors());
 
-// Connect to MongoDB Atlas
-mongoose.connect(process.env.MONGODB_URI)
-  .then((conn) => { 
-    // Day 1 Expected Outcome: Success Log
-    // Fixed string interpolation using backticks
-    console.log(`Database Connected: ${conn.connection.host}`); 
-  })
-  .catch((error) => {
-    console.error(`Database connection error: ${error.message}`);
-  });
-
-app.listen(PORT, () => { 
-  console.log(`Server is running on port ${PORT}`);
+// Basic API Status Route
+app.get('/api/status', (req, res) => {
+  res.status(200).json({ message: 'Server is running smoothly' });
 });
+
+// Mount API Routes
+app.use('/api/users', userRoutes);
+app.use('/api/projects', projectRoutes);
+
+// MongoDB Connection and Server Start
+const PORT = process.env.PORT || 5000;
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error("Error: MONGODB_URI is not defined in the .env file.");
+  process.exit(1);
+}
+
+mongoose.connect(MONGODB_URI)
+  .then(() => {
+    console.log('Successfully connected to MongoDB Database');
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Database connection failed:', err.message);
+  });
