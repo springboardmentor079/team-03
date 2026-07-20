@@ -1,12 +1,15 @@
 require('dotenv').config();
-//console.log('JWT_SECRET value:', process.env.JWT_SECRET);
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(helmet());
+app.use(morgan('dev'));
 
 const PORT = process.env.PORT || 5000;
 
