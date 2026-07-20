@@ -1,7 +1,11 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuth } from '../context/auth';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -11,11 +15,52 @@ const LoginPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login submitted:', formData);
-    // TODO: Add Axios POST request to /api/auth/login here
-    // If successful, save JWT and navigate to dashboard
+    
+    try {
+      const response = await axios.post('http://localhost:5000/api/auth/login', {
+        email: formData.email,
+        password: formData.password
+      });
+
+      const { token, user } = response.data;
+      
+      // Save token in localStorage
+      localStorage.setItem('token', token);
+      
+      // Update the AuthContext state (which also saves user in localStorage)
+      login(user);
+
+      // Extract user's role and redirect to their specific dashboard
+      const role = user.role;
+      switch (role) {
+        case 'Administrator':
+          navigate('/dashboard/admin');
+          break;
+        case 'Project Manager':
+          navigate('/dashboard/pm');
+          break;
+        case 'Site Engineer':
+          navigate('/dashboard/engineer');
+          break;
+        case 'Contractor':
+          navigate('/dashboard/contractor');
+          break;
+        case 'Worker':
+          navigate('/dashboard/worker');
+          break;
+        case 'Client':
+          navigate('/dashboard/client');
+          break;
+        default:
+          navigate('/dashboard');
+          break;
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert(error.response?.data?.message || 'Invalid credentials or server error');
+    }
   };
 
   return (
@@ -35,10 +80,10 @@ const LoginPage = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              required 
+              /* 'required' has been removed from here */
             />
           </div>
-          
+          ``
           <div className="mb-4">
             <label className="form-label fw-semibold">Password</label>
             <input 
@@ -47,7 +92,7 @@ const LoginPage = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              required 
+              /* 'required' has been removed from here */
             />
           </div>
 
