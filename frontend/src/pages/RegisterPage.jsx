@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import  { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -11,40 +10,19 @@ const RegisterPage = () => {
     role: ''
   });
 
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    
-    // 1. Check if passwords match
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-    
-    try {
-      // 2. Send the POST request to your backend running on port 5000
-    
-      const response = await axios.post('http://localhost:5000/api/auth/register', {
-        fullName: formData.fullName, // Changed 'name' to 'fullName' here!
-        email: formData.email,
-        password: formData.password,
-        role: formData.role
-      });
-
-      // 3. If successful, notify the user and redirect to the Login page
-      alert("Account created successfully! Please log in.");
-      navigate('/login');
-
-    } catch (error) {
-      console.error("Registration failed:", error);
-      // Show the exact error message sent from the backend (e.g., "User already exists")
-      alert(error.response?.data?.message || "An error occurred during registration");
-    }
+    console.log('Registration submitted:', formData);
+    // TODO: Add Axios POST request to /api/auth/register here
+    // If successful, navigate('/login')
   };
 
   return (

@@ -1,11 +1,16 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/user');
 
 exports.register = async (req, res) => {
   try {
     const { fullName, email, password, role } = req.body;
 
-    const newUser = new User({ fullName, email, password, role });
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    const newUser = new User({ fullName, email, password, role: role || 'worker' });
     await newUser.save(); // password gets hashed automatically by pre-save hook
 
     res.status(201).json({ message: 'User registered successfully' });
