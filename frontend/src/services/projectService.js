@@ -1,80 +1,174 @@
 import { dummyProjects } from '../mocks/projectData';
+import axios from 'axios';
+
+const STORAGE_KEY = 'buildtrack_projects';
+const API_URL = '/api/projects';
+
+// Helper to initialize and retrieve projects from persistent storage
+const getStoredProjects = () => {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(dummyProjects));
+      return [...dummyProjects];
+    }
+    return JSON.parse(data);
+  } catch (err) {
+    console.error('Error reading projects from storage:', err);
+    return [...dummyProjects];
+  }
+};
+
+// Helper to save projects list back to persistent storage
+const saveStoredProjects = (projects) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+  } catch (err) {
+    console.error('Error saving projects to storage:', err);
+  }
+};
 
 /**
- * Simulates fetching all projects with a 500ms network delay.
- * @returns {Promise<Array>} A promise resolving to the list of projects.
+ * Fetches all projects (with persistent storage & API fallback).
+ * @returns {Promise<Array>}
  */
-export const getProjects = () => {
+export const getProjects = async () => {
+  try {
+    // Attempt backend API call first
+    const response = await axios.get(API_URL);
+    if (response.data && Array.isArray(response.data)) {
+      saveStoredProjects(response.data);
+      return response.data;
+    }
+  } catch (err) {
+    // Fallback to persistent storage if API is not active
+  }
+
   return new Promise((resolve) => {
     setTimeout(() => {
-      resolve([...dummyProjects]);
-    }, 500);
+      resolve(getStoredProjects());
+    }, 300);
   });
 };
 
 /**
- * Simulates creating a new project.
- * Appends a random ID and a default status of "Planning".
- * Resolves with the created project after a 500ms delay.
- * @param {Object} newProject The new project details.
- * @returns {Promise<Object>} A promise resolving to the created project.
+ * Creates a new project and saves it persistently to storage/database.
+ * @param {Object} newProject 
+ * @returns {Promise<Object>}
  */
-export const createProject = (newProject) => {
+export const createProject = async (newProject) => {
+  const createdProjectPayload = {
+    ...newProject,
+    _id: newProject._id || 'proj-' + Math.random().toString(36).substring(2, 11),
+    status: newProject.status || 'Planning',
+    budget: newProject.budget ? Number(newProject.budget) : 0,
+    createdAt: new Date().toISOString()
+  };
+
+  try {
+    // Attempt backend API post
+    const response = await axios.post(API_URL, newProject);
+    if (response.data) {
+      const projects = getStoredProjects();
+      projects.push(response.data);
+      saveStoredProjects(projects);
+      return response.data;
+    }
+  } catch (err) {
+    // Fallback to local persistent storage
+  }
+
   return new Promise((resolve) => {
     setTimeout(() => {
-      const created = {
-        ...newProject,
-        _id: 'proj-' + Math.random().toString(36).substring(2, 11),
-        status: 'Planning',
-        // Convert budget to number if it is a numeric string
-        budget: newProject.budget ? Number(newProject.budget) : 0
-      };
-      dummyProjects.push(created);
-      resolve(created);
-    }, 500);
+      const projects = getStoredProjects();
+      projects.push(createdProjectPayload);
+      saveStoredProjects(projects);
+      
+      // Also sync dummyProjects in-memory array for backward compatibility
+      dummyProjects.push(createdProjectPayload);
+
+      resolve(createdProjectPayload);
+    }, 300);
   });
 };
 
 /**
- * Simulates updating an existing project.
- * @param {string} id The ID of the project to update.
- * @param {Object} updatedData The updated project details.
- * @returns {Promise<Object>} A promise resolving to the updated project.
+ * Updates an existing project persistently.
+ * @param {string} id 
+ * @param {Object} updatedData 
+ * @returns {Promise<Object>}
  */
-export const updateProject = (id, updatedData) => {
+export const updateProject = async (id, updatedData) => {
+  try {
+    const response = await axios.put(`${API_URL}/${id}`, updatedData);
+    if (response.data) {
+      const projects = getStoredProjects();
+      const idx = projects.findIndex((p) => p._id === id);
+      if (idx !== -1) {
+        projects[idx] = response.data;
+        saveStoredProjects(projects);
+      }
+      return response.data;
+    }
+  } catch (err) {
+    // Fallback to local persistent storage
+  }
+
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const index = dummyProjects.findIndex((p) => p._id === id);
+      const projects = getStoredProjects();
+      const index = projects.findIndex((p) => p._id === id);
       if (index !== -1) {
-        dummyProjects[index] = {
-          ...dummyProjects[index],
+        projects[index] = {
+          ...projects[index],
           ...updatedData,
-          budget: updatedData.budget ? Number(updatedData.budget) : dummyProjects[index].budget
+          budget: updatedData.budget ? Number(updatedData.budget) : projects[index].budget
         };
-        resolve(dummyProjects[index]);
+        saveStoredProjects(projects);
+
+        // Sync dummyProjects in-memory
+        const dummyIdx = dummyProjects.findIndex((p) => p._id === id);
+        if (dummyIdx !== -1) {
+          dummyProjects[dummyIdx] = projects[index];
+        }
+
+        resolve(projects[index]);
       } else {
         reject(new Error('Project not found'));
       }
-    }, 500);
+    }, 300);
   });
 };
 
 /**
- * Simulates deleting an existing project.
- * @param {string} id The ID of the project to delete.
- * @returns {Promise<boolean>} A promise resolving to true if deleted.
+ * Deletes an existing project persistently.
+ * @param {string} id 
+ * @returns {Promise<boolean>}
  */
-export const deleteProject = (id) => {
+export const deleteProject = async (id) => {
+  try {
+    await axios.delete(`${API_URL}/${id}`);
+  } catch (err) {
+    // Fallback to local persistent storage
+  }
+
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const index = dummyProjects.findIndex((p) => p._id === id);
+      const projects = getStoredProjects();
+      const index = projects.findIndex((p) => p._id === id);
       if (index !== -1) {
-        dummyProjects.splice(index, 1);
+        projects.splice(index, 1);
+        saveStoredProjects(projects);
+
+        const dummyIdx = dummyProjects.findIndex((p) => p._id === id);
+        if (dummyIdx !== -1) {
+          dummyProjects.splice(dummyIdx, 1);
+        }
+
         resolve(true);
       } else {
         reject(new Error('Project not found'));
       }
-    }, 500);
+    }, 300);
   });
 };
-

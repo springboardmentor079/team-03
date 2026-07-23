@@ -1,0 +1,89 @@
+import React, { useState, useEffect } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import InventoryManager from '../components/InventoryManager';
+import { dummyProjects } from '../mocks/projectData';
+import { getProjects } from '../services/projectService';
+
+const InventoryPage = () => {
+  const { id } = useParams();
+  const [projects, setProjects] = useState(dummyProjects);
+  const [selectedProjectId, setSelectedProjectId] = useState(id || 'proj-001');
+
+  useEffect(() => {
+    if (id) {
+      setSelectedProjectId(id);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const data = await getProjects();
+      if (data && data.length > 0) {
+        setProjects(data);
+      }
+    } catch (err) {
+      console.error('Error loading projects:', err);
+    }
+  };
+
+  const selectedProject = projects.find((p) => p._id === selectedProjectId);
+
+  return (
+    <div className="container py-4">
+      {/* Header & Project Selector */}
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb mb-1">
+              <li className="breadcrumb-item">
+                <Link to="/dashboard/projects-list" className="text-decoration-none">Projects</Link>
+              </li>
+              {selectedProject && (
+                <li className="breadcrumb-item">
+                  <Link to={`/dashboard/projects/${selectedProject._id}/milestones`} className="text-decoration-none">
+                    {selectedProject.title}
+                  </Link>
+                </li>
+              )}
+              <li className="breadcrumb-item active" aria-current="page">
+                Inventory Management
+              </li>
+            </ol>
+          </nav>
+          <h2 className="fw-bold mb-0">Inventory & Equipment Management</h2>
+          {selectedProject && (
+            <p className="text-primary fw-semibold mb-0">Project: {selectedProject.title} ({selectedProject.category})</p>
+          )}
+        </div>
+
+        <div className="d-flex align-items-center gap-2 flex-wrap">
+          <label className="fw-semibold small text-muted mb-0">Select Project:</label>
+          <select
+            className="form-select form-select-sm shadow-sm"
+            style={{ width: 'auto', minWidth: '220px' }}
+            value={selectedProjectId}
+            onChange={(e) => setSelectedProjectId(e.target.value)}
+          >
+            {projects.map((p) => (
+              <option key={p._id} value={p._id}>
+                {p.title}
+              </option>
+            ))}
+          </select>
+          <Link to="/dashboard/projects-list" className="btn btn-outline-secondary btn-sm fw-semibold">
+            &larr; Projects List
+          </Link>
+        </div>
+      </div>
+
+      {/* Main Inventory Manager Component */}
+      <InventoryManager projectId={selectedProjectId} />
+    </div>
+  );
+};
+
+export default InventoryPage;

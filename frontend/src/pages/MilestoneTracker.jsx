@@ -6,9 +6,14 @@ import {
   createMilestone,
   deleteMilestone
 } from '../services/milestoneService';
+import { getProjects } from '../services/projectService';
 import { dummyProjects } from '../mocks/projectData';
 import StatusDashboard from '../components/StatusDashboard';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
+import ResourceAllocation from '../components/ResourceAllocation';
+import FinancialDashboard from '../components/FinancialDashboard';
+import InventoryManager from '../components/InventoryManager';
+import WorkforceTracker from '../components/WorkforceTracker';
 
 const MilestoneTracker = () => {
   const { id } = useParams();
@@ -16,6 +21,7 @@ const MilestoneTracker = () => {
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState(null);
   const [projectTitle, setProjectTitle] = useState('');
+  const [projectBudget, setProjectBudget] = useState(500000);
 
   // Modal State for Adding New Milestone
   const [showAddModal, setShowAddModal] = useState(false);
@@ -42,9 +48,11 @@ const MilestoneTracker = () => {
       const data = await getMilestonesByProjectId(id);
       setMilestones(data);
 
-      const proj = dummyProjects.find((p) => p._id === id);
+      const allProjects = await getProjects();
+      const proj = allProjects.find((p) => p._id === id) || dummyProjects.find((p) => p._id === id);
       if (proj) {
         setProjectTitle(proj.title);
+        if (proj.budget) setProjectBudget(proj.budget);
       } else {
         setProjectTitle(`Project ${id}`);
       }
@@ -365,6 +373,18 @@ const MilestoneTracker = () => {
               </div>
             )}
           </div>
+
+          {/* Day 3 Resource Allocation Component */}
+          <ResourceAllocation projectId={id} />
+
+          {/* Day 4 Financial Dashboard Component */}
+          <FinancialDashboard projectId={id} totalBudget={projectBudget} />
+
+          {/* Day 5 Inventory Manager Component */}
+          <InventoryManager projectId={id} />
+
+          {/* Workforce Management Component */}
+          <WorkforceTracker projectId={id} />
         </>
       )}
 

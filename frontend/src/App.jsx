@@ -37,16 +37,24 @@ import Profile from './pages/Profile';
 import ProjectList from './pages/ProjectList';
 import ProjectForm from './pages/ProjectForm';
 import MilestoneTracker from './pages/MilestoneTracker';
+import InventoryPage from './pages/InventoryPage';
+import WorkforcePage from './pages/WorkforcePage';
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* The default route loads the Project List Page directly as requested */}
-        <Route path="/" element={<ProjectList />} />
+        {/* The default route loads the Inventory Management Page directly */}
+        <Route path="/" element={<InventoryPage />} />
+        <Route path="/inventory" element={<InventoryPage />} />
+        <Route path="/inventory/:id" element={<InventoryPage />} />
+        <Route path="/workforce" element={<WorkforcePage />} />
+        <Route path="/workforce/:id" element={<WorkforcePage />} />
         <Route path="/dashboard/projects-new" element={<ProjectForm />} />
         <Route path="/dashboard/projects-list" element={<ProjectList />} />
         <Route path="/dashboard/projects/:id/milestones" element={<MilestoneTracker />} />
+        <Route path="/dashboard/projects/:id/inventory" element={<InventoryPage />} />
+        <Route path="/dashboard/projects/:id/workforce" element={<WorkforcePage />} />
 
         {/* Commented out original routes temporarily
         <Route path="/login" element={<Login />} />
