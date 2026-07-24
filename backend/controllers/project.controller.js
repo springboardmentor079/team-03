@@ -50,7 +50,7 @@ exports.updateProject = async (req, res) => {
     const updated = await Project.findByIdAndUpdate(
       req.params.id,
       req.body,
-      { new: true, runValidators: true }
+      {  returnDocument: 'after', runValidators: true }
     ).populate('manager', 'fullName email role');
 
     if (!updated) {
