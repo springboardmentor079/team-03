@@ -7,6 +7,7 @@ const ProjectList = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeDropdownId, setActiveDropdownId] = useState(null);
 
   // States for Edit Modal
   const [editingProject, setEditingProject] = useState(null);
@@ -89,6 +90,9 @@ const ProjectList = () => {
 
 
   useEffect(() => {
+    const handleWindowClick = () => setActiveDropdownId(null);
+    window.addEventListener('click', handleWindowClick);
+
     let isMounted = true;
     getProjects()
       .then((data) => {
@@ -106,6 +110,7 @@ const ProjectList = () => {
 
     return () => {
       isMounted = false;
+      window.removeEventListener('click', handleWindowClick);
     };
   }, []);
 
@@ -191,7 +196,7 @@ const ProjectList = () => {
       {/* Header Panel */}
       <div className="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-4 pb-3 border-bottom">
         <div>
-          <h1 className="h2 fw-bold text-dark mb-1">Project Portfolio</h1>
+          <h1 className="h2 fw-bold text-dark mb-1">Project Management</h1>
           <p className="text-secondary mb-0">Monitor, filter, and schedule infrastructure and construction projects.</p>
         </div>
         <Link 
@@ -281,57 +286,94 @@ const ProjectList = () => {
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="d-flex justify-content-end gap-2 mt-auto pt-2 border-top flex-wrap">
-                    <Link
-                      to={`/dashboard/projects/${project._id}/workforce`}
-                      className="btn btn-outline-success btn-sm d-flex align-items-center gap-1 px-3 py-1.5 fw-semibold"
-                      style={{ fontSize: '13px' }}
-                    >
-                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                      Workforce
-                    </Link>
-                    <Link
-                      to={`/dashboard/projects/${project._id}/inventory`}
-                      className="btn btn-outline-warning text-dark btn-sm d-flex align-items-center gap-1 px-3 py-1.5 fw-semibold"
-                      style={{ fontSize: '13px' }}
-                    >
-                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                      </svg>
-                      Inventory
-                    </Link>
-                    <Link
-                      to={`/dashboard/projects/${project._id}/milestones`}
-                      className="btn btn-outline-info btn-sm d-flex align-items-center gap-1 px-3 py-1.5 fw-semibold"
-                      style={{ fontSize: '13px' }}
-                    >
-                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                      </svg>
-                      Milestones
-                    </Link>
-                    <button 
-                      onClick={() => handleEditClick(project)}
-                      className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 px-3 py-1.5 fw-semibold"
-                      style={{ fontSize: '13px' }}
-                    >
-                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-                      </svg>
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteClick(project)}
-                      className="btn btn-outline-danger btn-sm d-flex align-items-center gap-1 px-3 py-1.5 fw-semibold"
-                      style={{ fontSize: '13px' }}
-                    >
-                      <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                      Delete
-                    </button>
+                  <div className="d-flex align-items-center justify-content-between gap-1 mt-auto pt-3 border-top">
+                    {/* Left aligned: Workforce, Inventory, Milestones */}
+                    <div className="d-flex align-items-center gap-1 flex-wrap">
+                      <Link
+                        to={`/dashboard/projects/${project._id}/workforce`}
+                        className="btn btn-outline-success btn-sm d-flex align-items-center gap-1 px-2 py-1 fw-semibold"
+                        style={{ fontSize: '12px' }}
+                      >
+                        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Workforce
+                      </Link>
+                      <Link
+                        to={`/dashboard/projects/${project._id}/inventory`}
+                        className="btn btn-outline-warning text-dark btn-sm d-flex align-items-center gap-1 px-2 py-1 fw-semibold"
+                        style={{ fontSize: '12px' }}
+                      >
+                        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        Inventory
+                      </Link>
+                      <Link
+                        to={`/dashboard/projects/${project._id}/milestones`}
+                        className="btn btn-outline-info btn-sm d-flex align-items-center gap-1 px-2 py-1 fw-semibold"
+                        style={{ fontSize: '12px' }}
+                      >
+                        <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                        Milestones
+                      </Link>
+                    </div>
+
+                    {/* Right aligned: Three-dots Action Menu */}
+                    <div className="position-relative">
+                      <button 
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveDropdownId(activeDropdownId === project._id ? null : project._id);
+                        }}
+                        className="btn btn-light btn-sm rounded-circle d-flex align-items-center justify-content-center border"
+                        style={{ width: '32px', height: '32px', padding: 0 }}
+                        title="Actions"
+                        aria-expanded={activeDropdownId === project._id}
+                      >
+                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                        </svg>
+                      </button>
+
+                      {activeDropdownId === project._id && (
+                        <div 
+                          className="dropdown-menu show dropdown-menu-end shadow-sm border py-1 mb-2 position-absolute end-0"
+                          style={{ minWidth: '130px', zIndex: 1050, borderRadius: '8px', boxShadow: '0 -4px 16px rgba(0,0,0,0.12)', bottom: '100%', top: 'auto' }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button 
+                            className="dropdown-item d-flex align-items-center gap-2 py-2 px-3 text-dark fw-medium"
+                            style={{ fontSize: '13px' }}
+                            onClick={() => {
+                              setActiveDropdownId(null);
+                              handleEditClick(project);
+                            }}
+                          >
+                            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                            Edit
+                          </button>
+                          <button 
+                            className="dropdown-item d-flex align-items-center gap-2 py-2 px-3 text-danger fw-medium"
+                            style={{ fontSize: '13px' }}
+                            onClick={() => {
+                              setActiveDropdownId(null);
+                              handleDeleteClick(project);
+                            }}
+                          >
+                            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            Delete
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                 </div>
