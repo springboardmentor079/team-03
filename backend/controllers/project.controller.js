@@ -1,36 +1,75 @@
 const Project = require('../models/project');
 
-// POST /api/projects
-// Replace your exports.createProject with this:
 exports.createProject = async (req, res) => {
   try {
-    // 1. Extract the exact fields Austin's schema requires
-    const { name, category, status, location, startDate, manager } = req.body;
+    const { name, description, location, manager, category, status, startDate, endDate } = req.body;
 
-    // 2. Map them correctly to the MongoDB Model
-    const newProject = new Project({ 
-      name, 
-      category, 
-      status, 
-      location, 
-      startDate, 
-      manager 
+    const newProject = new Project({
+      name,
+      description,
+      location,
+      manager,
+      category,
+      status,
+      startDate,
+      endDate
     });
 
-    // 3. Save to database
-    const savedProject = await newProject.save();
-    res.status(201).json(savedProject);
+    await newProject.save();
+    res.status(201).json({ message: 'Project created successfully', project: newProject });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: 'Failed to create project', error: err.message });
   }
 };
 
-// GET /api/projects
 exports.getProjects = async (req, res) => {
   try {
-    const projects = await Project.find();
-    res.status(200).json(projects);
+    const projects = await Project.find().populate('manager', 'fullName email role');
+    res.json(projects);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: 'Failed to fetch projects', error: err.message });
+  }
+};
+
+exports.getProjectById = async (req, res) => {
+  try {
+    const project = await Project.findById(req.params.id)
+      .populate('manager', 'fullName email role');
+
+    if (!project) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    res.status(200).json(project);
+  } catch (err) {
+    res.status(400).json({ message: 'Invalid project ID', error: err.message });
+  }
+};
+
+exports.updateProject = async (req, res) => {
+  try {
+    const updated = await Project.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    ).populate('manager', 'fullName email role');
+
+    if (!updated) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    res.status(200).json(updated);
+  } catch (err) {
+    res.status(400).json({ message: 'Update failed', error: err.message });
+  }
+};
+
+exports.deleteProject = async (req, res) => {
+  try {
+    const deleted = await Project.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Project not found' });
+    }
+    res.status(200).json({ message: 'Project deleted successfully' });
+  } catch (err) {
+    res.status(400).json({ message: 'Delete failed', error: err.message });
   }
 };

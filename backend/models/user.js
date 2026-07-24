@@ -1,6 +1,7 @@
 // models/User.js
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+
 const userSchema = new mongoose.Schema({
   fullName: {
     type: String,
@@ -16,7 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: [true, 'Password string is required'] 
+    required: [true, 'Password string is required']
   },
   role: {
     type: String,
@@ -30,29 +31,22 @@ const userSchema = new mongoose.Schema({
     default: Date.now
   }
 });
-// Pre-save hook to hash the password before saving to MongoDB
+
+// FIXED: Modern Pre-save hook. 
+// Because this is an 'async' function, Mongoose no longer needs 'next'.
 userSchema.pre('save', async function() {
-  const user = this;
-
   // Only hash the password if it has been modified (or is new)
-  if (!user.isModified('password')) {
-    return; // Just return to proceed
+  if (!this.isModified('password')) {
+    return;
   }
 
-  try {
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(user.password, salt);
-  } catch (error) {
-    throw error; // Throwing an error automatically halts saving and passes it to the promise rejection
-  }
+  // Generate a salt and hash the password
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 });
+
+// Method to compare candidate password with the hashed password during Login
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  console.log('Plain text input:', candidatePassword);
-  console.log('Stored hash in DB:', this.password);
-  
-  const isMatch = await bcrypt.compare(candidatePassword, this.password);
-  console.log('Does it match?:', isMatch);
-  
-  return isMatch;
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 module.exports = mongoose.model('User', userSchema);
