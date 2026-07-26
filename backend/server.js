@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -8,6 +8,12 @@ const userRoutes = require('./routes/user.routes');
 const projectRoutes = require('./routes/project.routes');
 const authRoutes = require('./routes/auth');   
 const milestoneRoutes = require('./routes/milestone.routes');
+const resourceRoutes = require('./routes/resource.routes');
+const inventoryRoutes = require('./routes/inventory.routes');
+const workforceRoutes = require('./routes/workforce.routes');
+
+
+
    // ← added
 
 const app = express();
@@ -25,7 +31,11 @@ app.get('/api/status', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/auth', authRoutes); 
-app.use('/api', milestoneRoutes);                         // ← added
+app.use('/api', milestoneRoutes);  
+app.use('/api/resources', resourceRoutes); 
+app.use('/api/inventory', inventoryRoutes);
+app.use('/api/workforce', workforceRoutes);
+  // ← added
 
 // MongoDB Connection and Server Start
 const PORT = process.env.PORT || 5000;
