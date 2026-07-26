@@ -83,6 +83,24 @@ function App() {
             <Route path="/inventory/:id" element={<InventoryPage />} />
             <Route path="/workforce" element={<WorkforcePage />} />
             <Route path="/workforce/:id" element={<WorkforcePage />} />
+
+            {/* Added Missing Pages for Navigation */}
+            <Route path="/dashboard/resources/allocation" element={<ResourceAllocation />} />
+            <Route path="/dashboard/resources/equipment" element={<EquipmentTracking />} />
+            <Route path="/dashboard/resources/utilization" element={<ResourceUtilization />} />
+            
+            <Route path="/dashboard/inventory/materials" element={<MaterialInventory />} />
+            <Route path="/dashboard/inventory/stock" element={<StockMonitoring />} />
+            <Route path="/dashboard/inventory/procurement" element={<ProcurementRequest />} />
+            
+            <Route path="/dashboard/workforce/management" element={<WorkerManagement />} />
+            <Route path="/dashboard/workforce/attendance" element={<AttendanceTracking />} />
+            <Route path="/dashboard/workforce/shifts" element={<ShiftScheduling />} />
+            
+            <Route path="/dashboard/analytics/budget" element={<BudgetAnalytics />} />
+            <Route path="/dashboard/analytics/progress" element={<ProjectProgress />} />
+            <Route path="/dashboard/analytics/resources" element={<ResourceAnalytics />} />
+            <Route path="/dashboard/analytics/procurement" element={<ProcurementAnalytics />} />
           </Route>
           
         </Route>
