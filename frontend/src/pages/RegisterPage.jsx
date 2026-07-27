@@ -10,6 +10,7 @@ const RegisterPage = () => {
     confirmPassword: '',
     role: ''
   });
+  const [message, setMessage] = useState({ type: '', text: '' });
 
   const navigate = useNavigate();
 
@@ -19,10 +20,11 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage({ type: '', text: '' });
     
     // 1. Check if passwords match
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setMessage({ type: 'danger', text: 'Passwords do not match!' });
       return;
     }
     
@@ -36,13 +38,13 @@ const RegisterPage = () => {
       });
 
       // 3. If successful, notify the user and redirect to the Login page
-      alert("Account created successfully! Please log in.");
-      navigate('/login');
+      setMessage({ type: 'success', text: 'Account created successfully! Redirecting to login...' });
+      setTimeout(() => navigate('/login'), 2000);
 
     } catch (error) {
       console.error("Registration failed:", error);
       // Show the exact error message sent from the backend (e.g., "User already exists")
-      alert(error.response?.data?.message || "An error occurred during registration");
+      setMessage({ type: 'danger', text: error.response?.data?.message || "An error occurred during registration" });
     }
   };
 
@@ -53,6 +55,12 @@ const RegisterPage = () => {
           <h2 className="fw-bold" style={{ color: '#00c938' }}>Create Account</h2>
           <p className="text-muted">Join the BuildTrack platform</p>
         </div>
+
+        {message.text && (
+          <div className={`alert alert-${message.type} py-2 mb-4 text-center`} role="alert">
+            {message.text}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
