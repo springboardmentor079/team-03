@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ProcurementManager from '../../components/ProcurementManager';
 
 const ProjectManagerDashboard = () => {
   const [activeTab, setActiveTab] = useState('Overview');
@@ -92,7 +93,7 @@ const ProjectManagerDashboard = () => {
         marginBottom: '24px',
         paddingBottom: '1px'
       }}>
-        {['Overview', 'Milestones'].map(tab => (
+        {['Overview', 'Milestones', 'Procurement'].map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -121,7 +122,7 @@ const ProjectManagerDashboard = () => {
         borderRadius: '12px',
         border: '1px solid #3a3a45'
       }}>
-        {activeTab === 'Overview' ? (
+        {activeTab === 'Overview' && (
           <div>
             <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', fontWeight: 'bold' }}>Active Projects Summary</h3>
             <div style={{ overflowX: 'auto' }}>
@@ -168,7 +169,9 @@ const ProjectManagerDashboard = () => {
               </table>
             </div>
           </div>
-        ) : (
+        )}
+
+        {activeTab === 'Milestones' && (
           <div>
             <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', fontWeight: 'bold' }}>Pending & Completed Milestones</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -224,6 +227,12 @@ const ProjectManagerDashboard = () => {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {activeTab === 'Procurement' && (
+          <div style={{ color: '#212529' }}>
+            <ProcurementManager />
           </div>
         )}
       </div>
