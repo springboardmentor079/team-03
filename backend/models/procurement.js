@@ -1,41 +1,61 @@
-// models/Procurement.js
 const mongoose = require('mongoose');
 
-const procurementSchema = new mongoose.Schema({
-  project: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Project',
-    required: [true, 'Procurement requests must be tied to a project']
+const procurementSchema = new mongoose.Schema(
+  {
+    projectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project',
+      required: [true, 'Project ID is required'],
+    },
+    vendorName: {
+      type: String,
+      required: [true, 'Vendor name is required'],
+      trim: true,
+    },
+    itemName: {
+      type: String,
+      required: [true, 'Item name is required'],
+      trim: true,
+    },
+    quantity: {
+      type: Number,
+      required: [true, 'Quantity is required'],
+      min: [1, 'Quantity must be greater than 0'],
+    },
+    estimatedCost: {
+      type: Number,
+      required: [true, 'Estimated cost is required'],
+      min: [0, 'Estimated cost must be greater than or equal to 0'],
+    },
+    procurementCategory: {
+      type: String,
+      required: [true, 'Procurement category is required'],
+      enum: {
+        values: [
+          'Raw Materials',
+          'Equipment',
+          'Machinery',
+          'Safety Equipment',
+          'Office Supplies',
+        ],
+        message: '{VALUE} is not a valid procurement category',
+      },
+    },
+    status: {
+      type: String,
+      required: [true, 'Status is required'],
+      enum: {
+        values: ['Pending Approval', 'Approved', 'Ordered', 'Delivered'],
+        message: '{VALUE} is not a valid status',
+      },
+      default: 'Pending Approval',
+    },
   },
-  vendorName: {
-    type: String,
-    required: [true, 'Supplier/Vendor management identification is required'],
-    trim: true
-  },
-  category: {
-    type: String,
-    required: [true, 'Procurement item category is required'],
-    // Enforces categories directly from the document[cite: 2]
-    enum: ['Raw Materials', 'Equipment', 'Machinery', 'Safety Equipment', 'Office Supplies']
-  },
-  totalAmount: {
-    type: Number,
-    required: [true, 'Invoice tracking / Purchase order total cost is required']
-  },
-  status: {
-    type: String,
-    enum: ['Requested', 'Ordered', 'Invoiced', 'Delivered', 'Cancelled'],
-    default: 'Requested'
-  },
-  requestedBy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: [true, 'Must track the specific internal requestor']
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  {
+    timestamps: true, // Automatically includes createdAt and updatedAt fields
   }
-});
+);
 
-module.exports = mongoose.model('Procurement', procurementSchema);
+const Procurement = mongoose.model('Procurement', procurementSchema);
+
+module.exports = Procurement;

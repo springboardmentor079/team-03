@@ -2,7 +2,7 @@ export const inventoryData = [
   {
     _id: "inv-001",
     projectId: "proj-001",
-    itemName: "Portland Cement (Grade 53)",
+    itemName: "Cement",
     quantity: 450,
     unit: "Bags",
     lowStockThreshold: 100
@@ -10,7 +10,7 @@ export const inventoryData = [
   {
     _id: "inv-002",
     projectId: "proj-001",
-    itemName: "TMT Steel Rebar (12mm)",
+    itemName: "Steel",
     quantity: 15,
     unit: "Tons",
     lowStockThreshold: 20
@@ -18,7 +18,7 @@ export const inventoryData = [
   {
     _id: "inv-003",
     projectId: "proj-001",
-    itemName: "Hydraulic Excavator (CAT 320)",
+    itemName: "Electrical Materials",
     quantity: 3,
     unit: "Units",
     lowStockThreshold: 2
@@ -26,7 +26,7 @@ export const inventoryData = [
   {
     _id: "inv-004",
     projectId: "proj-001",
-    itemName: "Scaffolding Steel Frames",
+    itemName: "Plumbing Materials",
     quantity: 80,
     unit: "Sets",
     lowStockThreshold: 150
@@ -34,7 +34,7 @@ export const inventoryData = [
   {
     _id: "inv-005",
     projectId: "proj-002",
-    itemName: "Ready-Mix Concrete Batch",
+    itemName: "Concrete",
     quantity: 120,
     unit: "Cu. Meters",
     lowStockThreshold: 50

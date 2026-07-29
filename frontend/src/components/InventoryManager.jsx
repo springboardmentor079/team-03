@@ -13,7 +13,7 @@ const InventoryManager = ({ projectId }) => {
 
   // Form State
   const [formData, setFormData] = useState({
-    itemName: '',
+    itemName: 'Cement',
     quantity: '',
     unit: 'Bags',
     lowStockThreshold: ''
@@ -78,7 +78,7 @@ const InventoryManager = ({ projectId }) => {
       }));
 
       setFormData({
-        itemName: '',
+        itemName: 'Cement',
         quantity: '',
         unit: 'Bags',
         lowStockThreshold: ''
@@ -147,15 +147,21 @@ const InventoryManager = ({ projectId }) => {
 
           <form onSubmit={handleAddSubmit} className="row g-3 align-items-end">
             <div className="col-12 col-md-4">
-              <label className="form-label small fw-semibold text-dark mb-1">Item Name *</label>
-              <input
-                type="text"
-                className="form-control form-control-sm"
-                placeholder="e.g. Portland Cement"
+              <label className="form-label small fw-semibold text-dark mb-1">Material Category *</label>
+              <select
+                className="form-select form-select-sm"
                 value={formData.itemName}
                 onChange={(e) => setFormData({ ...formData, itemName: e.target.value })}
                 required
-              />
+              >
+                <option value="Cement">Cement</option>
+                <option value="Steel">Steel</option>
+                <option value="Bricks">Bricks</option>
+                <option value="Sand">Sand</option>
+                <option value="Concrete">Concrete</option>
+                <option value="Electrical Materials">Electrical Materials</option>
+                <option value="Plumbing Materials">Plumbing Materials</option>
+              </select>
             </div>
 
             <div className="col-6 col-md-2">
