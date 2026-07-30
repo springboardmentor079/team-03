@@ -11,7 +11,7 @@ const milestoneRoutes = require('./routes/milestone.routes');
 const resourceRoutes = require('./routes/resource.routes');
 const inventoryRoutes = require('./routes/inventory.routes');
 const workforceRoutes = require('./routes/workforce.routes');
-
+const procurementRoutes = require('./routes/procurement.routes');
 
 
    // ← added
@@ -35,6 +35,7 @@ app.use('/api', milestoneRoutes);
 app.use('/api/resources', resourceRoutes); 
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/workforce', workforceRoutes);
+app.use('/api/procurements', procurementRoutes);
   // ← added
 
 // MongoDB Connection and Server Start
