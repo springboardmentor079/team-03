@@ -1,1 +1,79 @@
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* Global Design System & Cyber Green Theme Overrides */
+:root {
+  --cyber-green: #00d053;
+  --cyber-green-dark: #00b046;
+  --cyber-green-light: rgba(0, 208, 83, 0.15);
+  --cyber-green-glow: rgba(0, 208, 83, 0.25);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Primary Button & Badge Overrides to Cyber Green */
+.btn-primary {
+  background-color: var(--cyber-green) !important;
+  border-color: var(--cyber-green) !important;
+  color: #ffffff !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--cyber-green-dark) !important;
+  border-color: var(--cyber-green-dark) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 10px var(--cyber-green-glow) !important;
+}
+
+.btn-outline-primary {
+  color: var(--cyber-green) !important;
+  border-color: var(--cyber-green) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background-color: var(--cyber-green) !important;
+  border-color: var(--cyber-green) !important;
+  color: #ffffff !important;
+}
+
+/* Primary Utilities */
+.bg-primary {
+  background-color: var(--cyber-green) !important;
+}
+
+.text-primary {
+  color: var(--cyber-green) !important;
+}
+
+.border-primary {
+  border-color: var(--cyber-green) !important;
+}
+
+.badge.bg-primary {
+  background-color: var(--cyber-green) !important;
+  color: #ffffff !important;
+}
+
+/* Active Nav Links and Tabs */
+.nav-pills .nav-link.active,
+.page-item.active .page-link {
+  background-color: var(--cyber-green) !important;
+  border-color: var(--cyber-green) !important;
+}
+
+.page-link {
+  color: var(--cyber-green);
+}
+
+/* Form Controls Focus Ring */
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: var(--cyber-green) !important;
+  box-shadow: 0 0 0 0.25rem var(--cyber-green-glow) !important;
+}

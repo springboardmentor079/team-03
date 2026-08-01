@@ -106,7 +106,7 @@ const CreatePurchaseOrderForm = ({ projectId = 'PROJ-101', onOrderCreated }) => 
 
   return (
     <div className="card shadow-sm border-0">
-      <div className="card-header bg-primary text-white py-3">
+      <div className="card-header text-white py-3" style={{ backgroundColor: '#00d053' }}>
         <h5 className="card-title mb-0 fw-bold">Create Purchase Order</h5>
       </div>
       <div className="card-body p-4">
@@ -190,6 +190,7 @@ const CreatePurchaseOrderForm = ({ projectId = 'PROJ-101', onOrderCreated }) => 
                 className="form-control"
                 placeholder="e.g. 50"
                 min="1"
+                max="1000000"
                 step="1"
                 value={formData.quantity}
                 onChange={handleChange}
@@ -244,7 +245,8 @@ const CreatePurchaseOrderForm = ({ projectId = 'PROJ-101', onOrderCreated }) => 
             <div className="col-12 mt-4">
               <button
                 type="submit"
-                className="btn btn-primary w-100 py-2 fw-semibold"
+                className="btn text-white w-100 py-2 fw-bold shadow-sm"
+                style={{ backgroundColor: '#00d053', borderColor: '#00d053' }}
                 disabled={loading}
               >
                 {loading ? (

@@ -68,10 +68,10 @@ export const createPurchaseOrder = (orderData) => {
 /**
  * Update status of an existing purchase order
  * @param {string} orderId - Purchase order ID
- * @param {string} newStatus - "Pending Approval", "Approved", "Rejected", "Dispatched", "Delivered"
+ * @param {string} newStatus - "Pending Approval", "Approved", "Rejected", "Ordered", "Dispatched", "Delivered"
  * @returns {Promise<Object>} Updated purchase order object
  */
-export const updateProcurementStatus = (orderId, newStatus) => {
+export const updateOrderStatus = (orderId, newStatus) => {
   return new Promise((resolve, reject) => {
     setTimeout(async () => {
       const all = getStoredProcurements();
@@ -110,6 +110,8 @@ export const updateProcurementStatus = (orderId, newStatus) => {
     }, 500);
   });
 };
+
+export const updateProcurementStatus = updateOrderStatus;
 
 /**
  * Delete a purchase order
