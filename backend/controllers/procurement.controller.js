@@ -1,0 +1,70 @@
+const Procurement = require('../models/procurement');
+
+const createPurchaseOrder = async (req, res) => {
+  try {
+    const { project, vendorName, category, totalAmount, status } = req.body;
+
+    const procurement = await Procurement.create({
+      project,
+      vendorName,
+      category,
+      totalAmount,
+      status, // optional — schema defaults to 'Requested' if omitted
+      requestedBy: req.user.id, // taken from the verified JWT, never trusted from the request body
+    });
+
+    res.status(201).json(procurement);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const getAllProcurements = async (req, res) => {
+  try {
+    const procurements = await Procurement.find()
+      .populate('projectId')
+      .populate('requestedBy', '-password'); // exclude password hash if User model has one
+    res.status(200).json(procurements);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+const updateProcurement = async (req, res) => {
+  try {
+    const updatedProcurement = await Procurement.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        returnDocument: 'after',           // Return the updated document
+        runValidators: true, // ENFORCES SCHEMA VALIDATION ON UPDATES
+      }
+    );
+
+    if (!updatedProcurement) {
+      return res.status(404).json({ message: 'Procurement order not found' });
+    }
+
+    res.status(200).json(updatedProcurement);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+const deleteProcurementOrder = async (req, res) => {
+  try {
+    const deleted = await Procurement.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Procurement order not found' });
+    }
+    res.status(200).json({ message: 'Order deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+module.exports = {
+  createPurchaseOrder,
+  getAllProcurements,
+  updateProcurement,
+  deleteProcurementOrder,
+};

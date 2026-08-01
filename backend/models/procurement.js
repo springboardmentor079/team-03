@@ -7,6 +7,11 @@ const procurementSchema = new mongoose.Schema(
       ref: 'Project',
       required: [true, 'Project ID is required'],
     },
+    // --- ADD requestedBy FIELD HERE ---
+    requestedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', // References your User model
+    },
     vendorName: {
       type: String,
       required: [true, 'Vendor name is required'],
@@ -52,9 +57,11 @@ const procurementSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Automatically includes createdAt and updatedAt fields
+    timestamps: true,
   }
 );
+
+procurementSchema.index({ projectId: 1, status: 1 });
 
 const Procurement = mongoose.model('Procurement', procurementSchema);
 

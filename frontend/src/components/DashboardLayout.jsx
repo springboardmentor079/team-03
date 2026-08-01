@@ -19,6 +19,7 @@ const DashboardLayout = () => {
   let activeLink = 'Dashboard';
   if (currentPath.includes('projects')) activeLink = 'Projects';
   if (currentPath.includes('inventory')) activeLink = 'Inventory';
+  if (currentPath.includes('procurement')) activeLink = 'Procurement';
   if (currentPath.includes('workforce')) activeLink = 'Workforce';
   if (currentPath.includes('resources')) activeLink = 'Resources';
   if (currentPath.includes('analytics')) activeLink = 'Analytics';
@@ -49,8 +50,8 @@ const DashboardLayout = () => {
         </svg>
       )
     },
-    // Only add these items if the user is an Administrator
-    ...(user?.role === 'Administrator' ? [
+    // Add Projects & Inventory for Administrator and Project Manager
+    ...(['Administrator', 'Project Manager'].includes(user?.role) ? [
       {
         name: 'Projects',
         path: '/dashboard/projects-list',
@@ -70,7 +71,26 @@ const DashboardLayout = () => {
             <line x1="12" y1="17" x2="12" y2="21" />
           </svg>
         )
-      },
+      }
+    ] : []),
+
+    // Add Procurement for Administrator, Project Manager, and Site Engineer
+    ...(['Administrator', 'Project Manager', 'Site Engineer'].includes(user?.role) ? [
+      {
+        name: 'Procurement',
+        path: '/dashboard/inventory/procurement',
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <path d="M16 10a4 4 0 0 1-8 0" />
+          </svg>
+        )
+      }
+    ] : []),
+
+    // Add Workforce, Resources, Analytics for Administrator and Project Manager
+    ...(['Administrator', 'Project Manager'].includes(user?.role) ? [
       {
         name: 'Workforce',
         path: '/workforce',

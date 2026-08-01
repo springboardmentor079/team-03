@@ -38,6 +38,7 @@ import ProjectForm from './pages/ProjectForm';
 import MilestoneTracker from './pages/MilestoneTracker';
 import InventoryPage from './pages/InventoryPage';
 import WorkforcePage from './pages/WorkforcePage';
+import CreatePurchaseOrderForm from './components/CreatePurchaseOrderForm';
 
 function App() {
   return (
@@ -72,8 +73,8 @@ function App() {
             <Route path="/dashboard/client" element={<ClientDashboard />} />
           </Route>
 
-          {/* Administrator-only project & management routes */}
-          <Route element={<ProtectedRoute allowedRoles={['Administrator']} />}>
+          {/* Administrator, PM & Site Engineer project & management routes */}
+          <Route element={<ProtectedRoute allowedRoles={['Administrator', 'Project Manager', 'Site Engineer']} />}>
             <Route path="/dashboard/projects-list" element={<ProjectList />} />
             <Route path="/dashboard/projects-new" element={<ProjectForm />} />
             <Route path="/dashboard/projects/:id/milestones" element={<MilestoneTracker />} />

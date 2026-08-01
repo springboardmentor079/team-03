@@ -1,4 +1,5 @@
 import React from 'react';
+import CreatePurchaseOrderForm from '../../components/CreatePurchaseOrderForm';
 import './AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -289,6 +290,15 @@ const AdminDashboard = () => {
             <div className="load-legend-dot red"></div>
             <span>Critical &ge; 85%</span>
           </div>
+        </div>
+      </div>
+    </section>
+
+    {/* PROCUREMENT SECTION */}
+    <section className="mt-5 mb-4 text-dark">
+      <div className="row justify-content-center">
+        <div className="col-lg-8">
+          <CreatePurchaseOrderForm projectId="PROJ-101" />
         </div>
       </div>
     </section>
