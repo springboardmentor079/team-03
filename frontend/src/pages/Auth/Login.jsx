@@ -11,46 +11,44 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const [errorMsg, setErrorMsg] = useState('');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     
     try {
-      // ==========================================
-      // REAL BACKEND CONNECTION (Commented out for now)
-      // ==========================================
-      // const response = await axios.post('http://localhost:5000/api/users/login', {
-      //   email,
-      //   password
-      // });
-      // const { token, user } = response.data;
-      // localStorage.setItem('token', token);
-      // login(user);
-      
       // ==========================================
       // SIMULATED LOGIN (Active for frontend testing)
       // ==========================================
       const dummyUser = { 
         name: 'Sasimaran', 
         email: email, 
-        role: 'Admin' // Change this to 'Project Manager', 'Site Engineer', etc. to test different views
+        role: 'Administrator'
       };
       
-      login(dummyUser); 
+      const token = 'simulated-jwt-token-98765';
+      localStorage.setItem('userToken', token);
+      localStorage.setItem('token', token);
+      localStorage.setItem('userRole', dummyUser.role);
+      localStorage.setItem('user', JSON.stringify(dummyUser));
+
+      login(dummyUser, token); 
       
       // Redirect the user to their protected dashboard based on role
-      if (dummyUser.role === 'Admin') {
-        navigate('/dashboard/admin');
+      if (dummyUser.role === 'Administrator') {
+        navigate('/dashboard/admin', { replace: true });
       } else if (dummyUser.role === 'Project Manager') {
-        navigate('/dashboard/pm');
+        navigate('/dashboard/pm', { replace: true });
       } else if (dummyUser.role === 'Site Engineer') {
-        navigate('/dashboard/engineer');
+        navigate('/dashboard/engineer', { replace: true });
       } else {
-        navigate('/dashboard'); // Fallback route
+        navigate('/dashboard', { replace: true });
       }
       
     } catch (error) {
       console.error("Login failed:", error);
-      alert(error.response?.data?.message || "An error occurred during login");
+      setErrorMsg(error.response?.data?.message || "An error occurred during authentication.");
     }
   };
 
@@ -76,7 +74,21 @@ const Login = () => {
       }}>
         {/* Title */}
         <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0', color: '#ffffff', textAlign: 'center' }}>Welcome to BuildTrack</h2>
-        <p style={{ color: '#a0a0a0', fontSize: '14px', margin: '0 0 32px 0', textAlign: 'center' }}>Sign in to access your dashboard roster.</p>
+        <p style={{ color: '#a0a0a0', fontSize: '14px', margin: '0 0 24px 0', textAlign: 'center' }}>Sign in to access your dashboard roster.</p>
+
+        {errorMsg && (
+          <div style={{
+            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+            color: '#ef4444',
+            padding: '10px',
+            borderRadius: '6px',
+            fontSize: '13px',
+            marginBottom: '20px',
+            textAlign: 'center'
+          }}>
+            {errorMsg}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '20px' }}>

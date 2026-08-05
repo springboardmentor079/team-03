@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import InventoryManager from '../components/InventoryManager';
-import { dummyProjects } from '../mocks/projectData';
 import { getProjects } from '../services/projectService';
 
 const InventoryPage = () => {
   const { id } = useParams();
-  const [projects, setProjects] = useState(dummyProjects);
+  const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(id || 'proj-001');
 
   useEffect(() => {

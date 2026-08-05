@@ -21,12 +21,16 @@ const LoginPage = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errorMessage) setErrorMessage('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
@@ -35,41 +39,45 @@ const LoginPage = () => {
       });
 
       const { token, user } = response.data;
+      const userToken = token || 'demo-jwt-token';
+      const userRole = user?.role || 'Site Engineer';
       
-      // Save token in localStorage
-      localStorage.setItem('token', token);
+      // Explicitly save auth credentials to localStorage for persistence & cross-tab sync
+      localStorage.setItem('userToken', userToken);
+      localStorage.setItem('token', userToken);
+      localStorage.setItem('userRole', userRole);
+      localStorage.setItem('user', JSON.stringify(user));
       
-      // Update the AuthContext state (which also saves user in localStorage)
-      login(user);
+      // Update AuthContext state
+      login(user, userToken);
 
-      // Extract user's role and redirect to their specific dashboard
-      const role = user.role;
-      switch (role) {
+      // Extract user's role and immediately route to designated dashboard
+      switch (userRole) {
         case 'Administrator':
-          navigate('/dashboard/admin');
+          navigate('/dashboard/admin', { replace: true });
           break;
         case 'Project Manager':
-          navigate('/dashboard/pm');
+          navigate('/dashboard/pm', { replace: true });
           break;
         case 'Site Engineer':
-          navigate('/dashboard/engineer');
+          navigate('/dashboard/engineer', { replace: true });
           break;
         case 'Contractor':
-          navigate('/dashboard/contractor');
+          navigate('/dashboard/contractor', { replace: true });
           break;
         case 'Worker':
-          navigate('/dashboard/worker');
+          navigate('/dashboard/worker', { replace: true });
           break;
         case 'Client':
-          navigate('/dashboard/client');
+          navigate('/dashboard/client', { replace: true });
           break;
         default:
-          navigate('/dashboard');
+          navigate('/dashboard', { replace: true });
           break;
       }
     } catch (error) {
       console.error('Login failed:', error);
-      alert(error.response?.data?.message || 'Invalid credentials or server error');
+      setErrorMessage(error.response?.data?.message || 'Invalid credentials or server connection issue.');
     }
   };
 
@@ -80,6 +88,12 @@ const LoginPage = () => {
           <h2 className="fw-bold" style={{ color: '#00c938' }}>BuildTrack</h2>
           <p className="text-muted">Sign in to your account</p>
         </div>
+
+        {errorMessage && (
+          <div className="alert alert-danger p-2 small mb-3 text-center" role="alert">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">

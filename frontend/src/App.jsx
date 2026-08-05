@@ -1,49 +1,58 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 
-// Import page components
-import LandingPage from './pages/LandingPage';
-import Login from "./pages/LoginPage";
-import Register from "./pages/RegisterPage";
-import PasswordReset from './pages/Auth/PasswordReset';
+// Import layout components synchronously
 import DashboardLayout from './components/DashboardLayout';
-import AdminDashboard from './pages/Dashboards/AdminDashboard';
-import ProjectManagerDashboard from './pages/Dashboards/ProjectManager';
-import SiteEngineer from './pages/Dashboards/SiteEngineer';
-import ContractorDashboard from './pages/Dashboards/ContractorDashboard';
-import WorkerDashboard from './pages/Dashboards/WorkerDasshboard';
-import ClientDashboard from './pages/Dashboards/ClientDashboard';
 
-// Remaining Screens
-import ProjectListing from './pages/Projects/ProjectListing';
-import ProjectDetails from './pages/Projects/ProjectDetails';
-import MilestoneTracking from './pages/Projects/MilestoneTracking';
-import ProjectStatus from './pages/Projects/ProjectStatus';
-import ResourceAllocation from './pages/Resource/ResourceAllocation';
-import EquipmentTracking from './pages/Resource/EquipmentTracking';
-import ResourceUtilization from './pages/Resource/ResourceUtilization';
-import MaterialInventory from './pages/Inventory/MaterialInventory';
-import StockMonitoring from './pages/Inventory/StockMonitory';
-import ProcurementRequest from './pages/Inventory/ProcurementRequest';
-import WorkerManagement from './pages/Workforce/Workermanagement';
-import AttendanceTracking from './pages/Workforce/AttendenceTracking';
-import ShiftScheduling from './pages/Workforce/ShiftScheduling';
-import BudgetAnalytics from './pages/Analytics/BudgetAnalytics';
-import ProjectProgress from './pages/Analytics/ProjectProgress';
-import ResourceAnalytics from './pages/Analytics/ResourceAnalytics';
-import ProcurementAnalytics from './pages/Analytics/ProcurementAnalytics';
-import Profile from './pages/Profile';
-import ProjectList from './pages/ProjectList';
-import ProjectForm from './pages/ProjectForm';
-import MilestoneTracker from './pages/MilestoneTracker';
-import InventoryPage from './pages/InventoryPage';
-import WorkforcePage from './pages/WorkforcePage';
-import CreatePurchaseOrderForm from './components/CreatePurchaseOrderForm';
+// Production Code-Splitting via React.lazy
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const Login = lazy(() => import('./pages/LoginPage'));
+const Register = lazy(() => import('./pages/RegisterPage'));
+const PasswordReset = lazy(() => import('./pages/Auth/PasswordReset'));
+
+const AdminDashboard = lazy(() => import('./pages/Dashboards/AdminDashboard'));
+const ProjectManagerDashboard = lazy(() => import('./pages/Dashboards/ProjectManager'));
+const SiteEngineer = lazy(() => import('./pages/Dashboards/SiteEngineer'));
+const ContractorDashboard = lazy(() => import('./pages/Dashboards/ContractorDashboard'));
+const WorkerDashboard = lazy(() => import('./pages/Dashboards/WorkerDasshboard'));
+const ClientDashboard = lazy(() => import('./pages/Dashboards/ClientDashboard'));
+
+const ResourceAllocation = lazy(() => import('./pages/Resource/ResourceAllocation'));
+const EquipmentTracking = lazy(() => import('./pages/Resource/EquipmentTracking'));
+const ResourceUtilization = lazy(() => import('./pages/Resource/ResourceUtilization'));
+const MaterialInventory = lazy(() => import('./pages/Inventory/MaterialInventory'));
+const StockMonitoring = lazy(() => import('./pages/Inventory/StockMonitory'));
+const ProcurementRequest = lazy(() => import('./pages/Inventory/ProcurementRequest'));
+const WorkerManagement = lazy(() => import('./pages/Workforce/Workermanagement'));
+const AttendanceTracking = lazy(() => import('./pages/Workforce/AttendenceTracking'));
+const ShiftScheduling = lazy(() => import('./pages/Workforce/ShiftScheduling'));
+const BudgetAnalytics = lazy(() => import('./pages/Analytics/BudgetAnalytics'));
+const ProjectProgress = lazy(() => import('./pages/Analytics/ProjectProgress'));
+const ResourceAnalytics = lazy(() => import('./pages/Analytics/ResourceAnalytics'));
+const ProcurementAnalytics = lazy(() => import('./pages/Analytics/ProcurementAnalytics'));
+const ProjectList = lazy(() => import('./pages/ProjectList'));
+const ProjectForm = lazy(() => import('./pages/ProjectForm'));
+const MilestoneTracker = lazy(() => import('./pages/MilestoneTracker'));
+const InventoryPage = lazy(() => import('./pages/InventoryPage'));
+const WorkforcePage = lazy(() => import('./pages/WorkforcePage'));
+
+const PageLoader = () => (
+  <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
+    <div className="text-center">
+      <div className="spinner-border text-success" role="status" style={{ width: '3rem', height: '3rem' }}>
+        <span className="visually-hidden">Loading...</span>
+      </div>
+      <p className="mt-3 text-muted fw-semibold" style={{ fontSize: '14px' }}>Loading BuildTrack Module...</p>
+    </div>
+  </div>
+);
 
 function App() {
   return (
     <Router>
-      <Routes>
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
         {/* Public Landing & Auth Routes */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -109,6 +118,7 @@ function App() {
         {/* Catch-all redirect to Landing Page */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </Router>
   );
 }
