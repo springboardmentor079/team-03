@@ -35,36 +35,40 @@ const LoginPage = () => {
       });
 
       const { token, user } = response.data;
+      const userToken = token || 'demo-jwt-token';
+      const userRole = user?.role || 'Site Engineer';
       
-      // Save token in localStorage
-      localStorage.setItem('token', token);
+      // Explicitly save auth credentials to localStorage for persistence & cross-tab sync
+      localStorage.setItem('userToken', userToken);
+      localStorage.setItem('token', userToken);
+      localStorage.setItem('userRole', userRole);
+      localStorage.setItem('user', JSON.stringify(user));
       
-      // Update the AuthContext state (which also saves user in localStorage)
-      login(user);
+      // Update AuthContext state
+      login(user, userToken);
 
-      // Extract user's role and redirect to their specific dashboard
-      const role = user.role;
-      switch (role) {
+      // Extract user's role and immediately route to designated dashboard
+      switch (userRole) {
         case 'Administrator':
-          navigate('/dashboard/admin');
+          navigate('/dashboard/admin', { replace: true });
           break;
         case 'Project Manager':
-          navigate('/dashboard/pm');
+          navigate('/dashboard/pm', { replace: true });
           break;
         case 'Site Engineer':
-          navigate('/dashboard/engineer');
+          navigate('/dashboard/engineer', { replace: true });
           break;
         case 'Contractor':
-          navigate('/dashboard/contractor');
+          navigate('/dashboard/contractor', { replace: true });
           break;
         case 'Worker':
-          navigate('/dashboard/worker');
+          navigate('/dashboard/worker', { replace: true });
           break;
         case 'Client':
-          navigate('/dashboard/client');
+          navigate('/dashboard/client', { replace: true });
           break;
         default:
-          navigate('/dashboard');
+          navigate('/dashboard', { replace: true });
           break;
       }
     } catch (error) {

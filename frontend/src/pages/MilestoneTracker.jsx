@@ -7,7 +7,6 @@ import {
   deleteMilestone
 } from '../services/milestoneService';
 import { getProjects } from '../services/projectService';
-import { dummyProjects } from '../mocks/projectData';
 import StatusDashboard from '../components/StatusDashboard';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
 import ResourceAllocation from '../components/ResourceAllocation';
@@ -49,9 +48,9 @@ const MilestoneTracker = () => {
       setMilestones(data);
 
       const allProjects = await getProjects();
-      const proj = allProjects.find((p) => p._id === id) || dummyProjects.find((p) => p._id === id);
+      const proj = allProjects.find((p) => p._id === id || p.id === id);
       if (proj) {
-        setProjectTitle(proj.title);
+        setProjectTitle(proj.title || proj.name);
         if (proj.budget) setProjectBudget(proj.budget);
       } else {
         setProjectTitle(`Project ${id}`);

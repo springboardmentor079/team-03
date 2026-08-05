@@ -32,20 +32,26 @@ const Login = () => {
       const dummyUser = { 
         name: 'Sasimaran', 
         email: email, 
-        role: 'Admin' // Change this to 'Project Manager', 'Site Engineer', etc. to test different views
+        role: 'Administrator'
       };
       
-      login(dummyUser); 
+      const token = 'simulated-jwt-token-98765';
+      localStorage.setItem('userToken', token);
+      localStorage.setItem('token', token);
+      localStorage.setItem('userRole', dummyUser.role);
+      localStorage.setItem('user', JSON.stringify(dummyUser));
+
+      login(dummyUser, token); 
       
       // Redirect the user to their protected dashboard based on role
-      if (dummyUser.role === 'Admin') {
-        navigate('/dashboard/admin');
+      if (dummyUser.role === 'Administrator') {
+        navigate('/dashboard/admin', { replace: true });
       } else if (dummyUser.role === 'Project Manager') {
-        navigate('/dashboard/pm');
+        navigate('/dashboard/pm', { replace: true });
       } else if (dummyUser.role === 'Site Engineer') {
-        navigate('/dashboard/engineer');
+        navigate('/dashboard/engineer', { replace: true });
       } else {
-        navigate('/dashboard'); // Fallback route
+        navigate('/dashboard', { replace: true });
       }
       
     } catch (error) {

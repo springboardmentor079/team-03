@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import CreatePurchaseOrderForm from './CreatePurchaseOrderForm';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
+import InvoiceDashboard from './InvoiceDashboard';
+import VendorDashboard from './VendorDashboard';
 import {
   getAllProcurements,
   updateOrderStatus,
@@ -25,6 +27,7 @@ const STATUSES = ['All', 'Pending Approval', 'Approved', 'Rejected', 'Dispatched
 const ProcurementManager = ({ projectId }) => {
   const { user } = useAuth();
 
+  const [activeTab, setActiveTab] = useState('orders'); // 'orders' | 'invoices' | 'vendors'
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [actionLoadingId, setActionLoadingId] = useState(null);
@@ -179,215 +182,243 @@ const ProcurementManager = ({ projectId }) => {
         </button>
       </div>
 
-      {/* KPI Cards Row */}
-      <div className="row g-3 mb-4">
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm bg-white rounded-3 p-3">
-            <span className="text-muted fs-7 text-uppercase fw-bold">Total Estimated Spend</span>
-            <h3 className="fw-bold text-dark my-1">${totalSpend.toLocaleString()}</h3>
-            <span className="text-secondary small">{orders.length} total orders logged</span>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm bg-white rounded-3 p-3 border-start border-warning border-4">
-            <span className="text-muted fs-7 text-uppercase fw-bold">Pending Approvals</span>
-            <h3 className="fw-bold text-warning my-1">{pendingCount}</h3>
-            <span className="text-muted small">Requires 2nd eye approval</span>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm bg-white rounded-3 p-3 border-start border-primary border-4">
-            <span className="text-muted fs-7 text-uppercase fw-bold">Approved / In Transit</span>
-            <h3 className="fw-bold text-primary my-1">{approvedCount}</h3>
-            <span className="text-muted small">Order fulfillment active</span>
-          </div>
-        </div>
-
-        <div className="col-md-3">
-          <div className="card border-0 shadow-sm bg-white rounded-3 p-3 border-start border-success border-4">
-            <span className="text-muted fs-7 text-uppercase fw-bold">Delivered & In Stock</span>
-            <h3 className="fw-bold text-success my-1">{deliveredCount}</h3>
-            <span className="text-muted small">Added to inventory</span>
-          </div>
-        </div>
+      {/* Module Navigation Tabs */}
+      <div className="d-flex gap-2 mb-4 border-bottom pb-2">
+        <button
+          className={`btn ${activeTab === 'orders' ? 'btn-success fw-bold' : 'btn-light text-secondary border'}`}
+          onClick={() => setActiveTab('orders')}
+        >
+          📦 Purchase Orders Ledger
+        </button>
+        <button
+          className={`btn ${activeTab === 'invoices' ? 'btn-success fw-bold' : 'btn-light text-secondary border'}`}
+          onClick={() => setActiveTab('invoices')}
+        >
+          📄 Invoice Tracking System
+        </button>
+        <button
+          className={`btn ${activeTab === 'vendors' ? 'btn-success fw-bold' : 'btn-light text-secondary border'}`}
+          onClick={() => setActiveTab('vendors')}
+        >
+          🏭 Vendor & Supplier Directory
+        </button>
       </div>
 
-      {/* Collapsible Form Section */}
-      {showFormModal && (
-        <div className="card shadow border-0 mb-4 animate__animated animate__fadeIn">
-          <div className="card-body p-0">
-            <CreatePurchaseOrderForm
-              projectId={projectId || 'PROJ-101'}
-              onOrderCreated={handleOrderCreated}
-            />
-          </div>
-        </div>
-      )}
+      {activeTab === 'invoices' && <InvoiceDashboard />}
+      {activeTab === 'vendors' && <VendorDashboard />}
+      {activeTab === 'orders' && (
+        <>
+          {/* KPI Cards Row */}
+          <div className="row g-3 mb-4">
+            <div className="col-md-3">
+              <div className="card border-0 shadow-sm bg-white rounded-3 p-3">
+                <span className="text-muted fs-7 text-uppercase fw-bold">Total Estimated Spend</span>
+                <h3 className="fw-bold text-dark my-1">${totalSpend.toLocaleString()}</h3>
+                <span className="text-secondary small">{orders.length} total orders logged</span>
+              </div>
+            </div>
 
-      {/* Search & Filter Toolbar */}
-      <div className="card shadow-sm border-0 mb-4">
-        <div className="card-body p-3 bg-light rounded-3">
-          <div className="row g-3 align-items-center">
-            {/* Search Input */}
-            <div className="col-md-4">
-              <div className="input-group">
-                <span className="input-group-text bg-white border-end-0">🔍</span>
-                <input
-                  type="text"
-                  className="form-control border-start-0"
-                  placeholder="Search item, vendor, requester..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+            <div className="col-md-3">
+              <div className="card border-0 shadow-sm bg-white rounded-3 p-3 border-start border-warning border-4">
+                <span className="text-muted fs-7 text-uppercase fw-bold">Pending Approvals</span>
+                <h3 className="fw-bold text-warning my-1">{pendingCount}</h3>
+                <span className="text-muted small">Requires 2nd eye approval</span>
+              </div>
+            </div>
+
+            <div className="col-md-3">
+              <div className="card border-0 shadow-sm bg-white rounded-3 p-3 border-start border-primary border-4">
+                <span className="text-muted fs-7 text-uppercase fw-bold">Approved / In Transit</span>
+                <h3 className="fw-bold text-primary my-1">{approvedCount}</h3>
+                <span className="text-muted small">Order fulfillment active</span>
+              </div>
+            </div>
+
+            <div className="col-md-3">
+              <div className="card border-0 shadow-sm bg-white rounded-3 p-3 border-start border-success border-4">
+                <span className="text-muted fs-7 text-uppercase fw-bold">Delivered & In Stock</span>
+                <h3 className="fw-bold text-success my-1">{deliveredCount}</h3>
+                <span className="text-muted small">Added to inventory</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Collapsible Form Section */}
+          {showFormModal && (
+            <div className="card shadow border-0 mb-4 animate__animated animate__fadeIn">
+              <div className="card-body p-0">
+                <CreatePurchaseOrderForm
+                  projectId={projectId || 'PROJ-101'}
+                  onOrderCreated={handleOrderCreated}
                 />
               </div>
             </div>
+          )}
 
-            {/* Category Filter */}
-            <div className="col-md-4">
-              <div className="d-flex align-items-center">
-                <label className="me-2 fw-semibold text-muted text-nowrap">Category:</label>
-                <select
-                  className="form-select"
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                  {CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+          {/* Search & Filter Toolbar */}
+          <div className="card shadow-sm border-0 mb-4">
+            <div className="card-body p-3 bg-light rounded-3">
+              <div className="row g-3 align-items-center">
+                {/* Search Input */}
+                <div className="col-md-4">
+                  <div className="input-group">
+                    <span className="input-group-text bg-white border-end-0">🔍</span>
+                    <input
+                      type="text"
+                      className="form-control border-start-0"
+                      placeholder="Search item, vendor, requester..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-            {/* Status Filter */}
-            <div className="col-md-4">
-              <div className="d-flex align-items-center">
-                <label className="me-2 fw-semibold text-muted text-nowrap">Status:</label>
-                <select
-                  className="form-select"
-                  value={selectedStatus}
-                  onChange={(e) => setSelectedStatus(e.target.value)}
-                >
-                  {STATUSES.map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
+                {/* Category Filter */}
+                <div className="col-md-4">
+                  <div className="d-flex align-items-center">
+                    <label className="me-2 fw-semibold text-muted text-nowrap">Category:</label>
+                    <select
+                      className="form-select"
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                    >
+                      {CATEGORIES.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Status Filter */}
+                <div className="col-md-4">
+                  <div className="d-flex align-items-center">
+                    <label className="me-2 fw-semibold text-muted text-nowrap">Status:</label>
+                    <select
+                      className="form-select"
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                    >
+                      {STATUSES.map((s) => (
+                        <option key={s} value={s}>
+                          {s}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Purchase Orders Ledger */}
-      <div className="card shadow-sm border-0">
-        <div className="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
-          <h5 className="fw-bold mb-0 text-dark">Purchase Orders Ledger</h5>
-          <span className="badge bg-secondary">{filteredOrders.length} Orders Found</span>
-        </div>
-
-        <div className="card-body p-0">
-          {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status"></div>
-              <p className="text-muted mt-2">Loading procurement data...</p>
+          {/* Purchase Orders Ledger */}
+          <div className="card shadow-sm border-0">
+            <div className="card-header bg-white py-3 d-flex justify-content-between align-items-center border-bottom">
+              <h5 className="fw-bold mb-0 text-dark">Purchase Orders Ledger</h5>
+              <span className="badge bg-secondary">{filteredOrders.length} Orders Found</span>
             </div>
-          ) : filteredOrders.length === 0 ? (
-            <div className="text-center py-5 text-muted">
-              <h5>No purchase orders match your filter criteria.</h5>
-              <p className="mb-0">Try clearing filters or adding a new purchase order.</p>
-            </div>
-          ) : (
-            <div className="table-responsive">
-              <table className="table table-hover align-middle mb-0">
-                <thead className="table-light">
-                  <tr>
-                    <th className="ps-3">PO Ref ID</th>
-                    <th>Item & Category</th>
-                    <th>Requested By</th>
-                    <th>Vendor</th>
-                    <th>Qty & Cost</th>
-                    <th>Status</th>
-                    <th className="text-end pe-4">Approval Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOrders.map((order) => {
-                    const isUpdating = actionLoadingId === order._id;
 
-                    // Four-Eyes Principle Checks
-                    const isApproverRole = ['Administrator', 'Project Manager'].includes(user?.role);
-                    const currentUserName = user?.name || user?.username || '';
-                    const isSelfOrder =
-                      currentUserName &&
-                      order.createdBy &&
-                      currentUserName.toLowerCase() === order.createdBy.toLowerCase();
-                    const canApproveOrReject = isApproverRole && !isSelfOrder;
-
-                    return (
-                      <tr key={order._id}>
-                        <td className="ps-3 fw-bold text-secondary">{order._id}</td>
-
-                        <td>
-                          <div className="fw-bold text-dark">{order.itemName}</div>
-                          <span className="badge bg-light text-dark border">
-                            {order.procurementCategory}
-                          </span>
-                        </td>
-
-                        <td>
-                          <div className="fw-semibold text-dark">
-                            {order.createdBy || 'Site Engineer'}
-                          </div>
-                          <small className="text-muted">
-                            {order.createdByRole || 'Requester'}
-                          </small>
-                        </td>
-
-                        <td className="fw-semibold text-secondary">{order.vendorName}</td>
-
-                        <td>
-                          <div>
-                            <span className="fw-bold">{order.quantity}</span> units
-                          </div>
-                          <div className="fw-bold text-success small">
-                            ${Number(order.estimatedCost).toLocaleString()}
-                          </div>
-                        </td>
-
-                        <td>
-                          <OrderStatusBadge status={order.status} />
-                        </td>
-
-                        <td className="text-end pe-4">
-                          {isUpdating ? (
-                            <div className="spinner-border spinner-border-sm text-primary" role="status"></div>
-                          ) : (
-                            <div className="d-flex align-items-center justify-content-end gap-2">
-                              <OrderActionButtons order={order} onUpdateStatus={handleStatusChange} />
-                              <button
-                                className="btn btn-outline-danger btn-sm"
-                                onClick={() => setOrderToDelete(order)}
-                                title="Delete Order"
-                              >
-                                🗑
-                              </button>
-                            </div>
-                          )}
-                        </td>
+            <div className="card-body p-0">
+              {loading ? (
+                <div className="text-center py-5">
+                  <div className="spinner-border text-primary" role="status"></div>
+                  <p className="text-muted mt-2">Loading procurement data...</p>
+                </div>
+              ) : filteredOrders.length === 0 ? (
+                <div className="text-center py-5 text-muted">
+                  <h5>No purchase orders match your filter criteria.</h5>
+                  <p className="mb-0">Try clearing filters or adding a new purchase order.</p>
+                </div>
+              ) : (
+                <div className="table-responsive">
+                  <table className="table table-hover align-middle mb-0">
+                    <thead className="table-light">
+                      <tr>
+                        <th className="ps-3">PO Ref ID</th>
+                        <th>Item & Category</th>
+                        <th>Requested By</th>
+                        <th>Vendor</th>
+                        <th>Qty & Cost</th>
+                        <th>Status</th>
+                        <th className="text-end pe-4">Approval Actions</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                    </thead>
+                    <tbody>
+                      {filteredOrders.map((order) => {
+                        const isUpdating = actionLoadingId === order._id;
+
+                        // Four-Eyes Principle Checks
+                        const isApproverRole = ['Administrator', 'Project Manager'].includes(user?.role);
+                        const currentUserName = user?.name || user?.username || '';
+                        const isSelfOrder =
+                          currentUserName &&
+                          order.createdBy &&
+                          currentUserName.toLowerCase() === order.createdBy.toLowerCase();
+                        const canApproveOrReject = isApproverRole && !isSelfOrder;
+
+                        return (
+                          <tr key={order._id}>
+                            <td className="ps-3 fw-bold text-secondary">{order._id}</td>
+
+                            <td>
+                              <div className="fw-bold text-dark">{order.itemName}</div>
+                              <span className="badge bg-light text-dark border">
+                                {order.procurementCategory}
+                              </span>
+                            </td>
+
+                            <td>
+                              <div className="fw-semibold text-dark">
+                                {order.createdBy || 'Site Engineer'}
+                              </div>
+                              <small className="text-muted">
+                                {order.createdByRole || 'Requester'}
+                              </small>
+                            </td>
+
+                            <td className="fw-semibold text-secondary">{order.vendorName}</td>
+
+                            <td>
+                              <div>
+                                <span className="fw-bold">{order.quantity}</span> units
+                              </div>
+                              <div className="fw-bold text-success small">
+                                ${Number(order.estimatedCost).toLocaleString()}
+                              </div>
+                            </td>
+
+                            <td>
+                              <OrderStatusBadge status={order.status} />
+                            </td>
+
+                            <td className="text-end pe-4">
+                              {isUpdating ? (
+                                <div className="spinner-border spinner-border-sm text-primary" role="status"></div>
+                              ) : (
+                                <div className="d-flex align-items-center justify-content-end gap-2">
+                                  <OrderActionButtons order={order} onUpdateStatus={handleStatusChange} />
+                                  <button
+                                    className="btn btn-outline-danger btn-sm"
+                                    onClick={() => setOrderToDelete(order)}
+                                    title="Delete Order"
+                                  >
+                                    🗑
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
 
       {/* Custom Delete Confirmation Modal */}
       <DeleteConfirmationModal

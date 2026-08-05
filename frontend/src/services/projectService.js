@@ -1,174 +1,101 @@
-import { dummyProjects } from '../mocks/projectData';
 import axios from 'axios';
 
-const STORAGE_KEY = 'buildtrack_projects';
 const API_URL = '/api/projects';
 
-// Helper to initialize and retrieve projects from persistent storage
-const getStoredProjects = () => {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (!data) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(dummyProjects));
-      return [...dummyProjects];
-    }
-    return JSON.parse(data);
-  } catch (err) {
-    console.error('Error reading projects from storage:', err);
-    return [...dummyProjects];
-  }
-};
+// Explicitly clear legacy local storage key
+localStorage.removeItem('buildtrack_projects');
 
-// Helper to save projects list back to persistent storage
-const saveStoredProjects = (projects) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
-  } catch (err) {
-    console.error('Error saving projects to storage:', err);
-  }
+const getAuthHeader = () => {
+  const token = localStorage.getItem('userToken') || localStorage.getItem('token');
+  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
 };
 
 /**
- * Fetches all projects (with persistent storage & API fallback).
- * @returns {Promise<Array>}
+ * Fetches all projects directly from the backend MongoDB database.
+ * @returns {Promise<Array>} Array of project objects
  */
 export const getProjects = async () => {
   try {
-    // Attempt backend API call first
-    const response = await axios.get(API_URL);
-    if (response.data && Array.isArray(response.data)) {
-      saveStoredProjects(response.data);
-      return response.data;
-    }
+    const response = await axios.get(API_URL, getAuthHeader());
+    const data = Array.isArray(response.data) ? response.data : response.data.projects || [];
+    return data.map((p) => ({
+      ...p,
+      title: p.title || p.name
+    }));
   } catch (err) {
-    // Fallback to persistent storage if API is not active
+    console.error('Failed to fetch projects from database:', err);
+    throw err;
   }
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(getStoredProjects());
-    }, 300);
-  });
 };
 
 /**
- * Creates a new project and saves it persistently to storage/database.
- * @param {Object} newProject 
+ * Fetches a single project by ID directly from the database.
+ * @param {string} id 
  * @returns {Promise<Object>}
  */
-export const createProject = async (newProject) => {
-  const createdProjectPayload = {
-    ...newProject,
-    _id: newProject._id || 'proj-' + Math.random().toString(36).substring(2, 11),
-    status: newProject.status || 'Planning',
-    budget: newProject.budget ? Number(newProject.budget) : 0,
-    createdAt: new Date().toISOString()
-  };
-
+export const getProjectById = async (id) => {
   try {
-    // Attempt backend API post
-    const response = await axios.post(API_URL, newProject);
-    if (response.data) {
-      const projects = getStoredProjects();
-      projects.push(response.data);
-      saveStoredProjects(projects);
-      return response.data;
-    }
+    const response = await axios.get(`${API_URL}/${id}`, getAuthHeader());
+    const p = response.data;
+    return p ? { ...p, title: p.title || p.name } : null;
   } catch (err) {
-    // Fallback to local persistent storage
+    console.error(`Failed to fetch project ${id}:`, err);
+    throw err;
   }
-
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const projects = getStoredProjects();
-      projects.push(createdProjectPayload);
-      saveStoredProjects(projects);
-      
-      // Also sync dummyProjects in-memory array for backward compatibility
-      dummyProjects.push(createdProjectPayload);
-
-      resolve(createdProjectPayload);
-    }, 300);
-  });
 };
 
 /**
- * Updates an existing project persistently.
+ * Creates a new project directly in the backend MongoDB database.
+ * @param {Object} newProject 
+ * @returns {Promise<Object>} The newly created project
+ */
+export const createProject = async (newProject) => {
+  try {
+    const payload = {
+      ...newProject,
+      name: newProject.name || newProject.title
+    };
+    const response = await axios.post(API_URL, payload, getAuthHeader());
+    const created = response.data.project || response.data;
+    return { ...created, title: created.title || created.name };
+  } catch (err) {
+    console.error('Failed to create project in database:', err);
+    throw err;
+  }
+};
+
+/**
+ * Updates an existing project directly in the backend database.
  * @param {string} id 
  * @param {Object} updatedData 
  * @returns {Promise<Object>}
  */
 export const updateProject = async (id, updatedData) => {
   try {
-    const response = await axios.put(`${API_URL}/${id}`, updatedData);
-    if (response.data) {
-      const projects = getStoredProjects();
-      const idx = projects.findIndex((p) => p._id === id);
-      if (idx !== -1) {
-        projects[idx] = response.data;
-        saveStoredProjects(projects);
-      }
-      return response.data;
-    }
+    const payload = {
+      ...updatedData,
+      name: updatedData.name || updatedData.title
+    };
+    const response = await axios.put(`${API_URL}/${id}`, payload, getAuthHeader());
+    const updated = response.data.project || response.data;
+    return { ...updated, title: updated.title || updated.name };
   } catch (err) {
-    // Fallback to local persistent storage
+    console.error(`Failed to update project ${id}:`, err);
+    throw err;
   }
-
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const projects = getStoredProjects();
-      const index = projects.findIndex((p) => p._id === id);
-      if (index !== -1) {
-        projects[index] = {
-          ...projects[index],
-          ...updatedData,
-          budget: updatedData.budget ? Number(updatedData.budget) : projects[index].budget
-        };
-        saveStoredProjects(projects);
-
-        // Sync dummyProjects in-memory
-        const dummyIdx = dummyProjects.findIndex((p) => p._id === id);
-        if (dummyIdx !== -1) {
-          dummyProjects[dummyIdx] = projects[index];
-        }
-
-        resolve(projects[index]);
-      } else {
-        reject(new Error('Project not found'));
-      }
-    }, 300);
-  });
 };
 
 /**
- * Deletes an existing project persistently.
+ * Deletes an existing project directly from the backend database.
  * @param {string} id 
  * @returns {Promise<boolean>}
  */
 export const deleteProject = async (id) => {
   try {
-    await axios.delete(`${API_URL}/${id}`);
+    await axios.delete(`${API_URL}/${id}`, getAuthHeader());
+    return true;
   } catch (err) {
-    // Fallback to local persistent storage
+    console.error(`Failed to delete project ${id}:`, err);
+    throw err;
   }
-
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const projects = getStoredProjects();
-      const index = projects.findIndex((p) => p._id === id);
-      if (index !== -1) {
-        projects.splice(index, 1);
-        saveStoredProjects(projects);
-
-        const dummyIdx = dummyProjects.findIndex((p) => p._id === id);
-        if (dummyIdx !== -1) {
-          dummyProjects.splice(dummyIdx, 1);
-        }
-
-        resolve(true);
-      } else {
-        reject(new Error('Project not found'));
-      }
-    }, 300);
-  });
 };
