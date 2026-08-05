@@ -63,9 +63,27 @@ const updateProcurementStatus = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+const deleteProcurement = async (req, res) => {
+  try {
+    const procurement = await Procurement.findByIdAndDelete(req.params.id);
+
+    if (!procurement) {
+      return res.status(404).json({ message: 'Procurement record not found' });
+    }
+
+    return res.status(200).json({
+      message: 'Procurement record deleted successfully',
+      deletedId: procurement._id,
+    });
+  } catch (err) {
+    return res.status(400).json({ message: err.message });
+  }
+};
 
 module.exports = {
   createPurchaseOrder,
   getAllProcurements,
   updateProcurementStatus,
+  deleteProcurement,
 };
+
