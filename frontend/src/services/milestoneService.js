@@ -1,14 +1,7 @@
-import axios from 'axios';
-
-const API_BASE = '/api';
+import api from './api';
 
 // Explicitly clear legacy local storage key
 localStorage.removeItem('buildtrack_milestones');
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem('userToken') || localStorage.getItem('token');
-  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-};
 
 /**
  * Fetches milestones for a specific project ID directly from the backend database.
@@ -17,7 +10,7 @@ const getAuthHeader = () => {
  */
 export const getMilestonesByProjectId = async (projectId) => {
   try {
-    const response = await axios.get(`${API_BASE}/projects/${projectId}/milestones`, getAuthHeader());
+    const response = await api.get(`/projects/${projectId}/milestones`);
     return Array.isArray(response.data) ? response.data : response.data.milestones || [];
   } catch (err) {
     console.error(`Failed to fetch milestones for project ${projectId}:`, err);
@@ -33,7 +26,7 @@ export const getMilestonesByProjectId = async (projectId) => {
 export const createMilestone = async (newMilestone) => {
   try {
     const projId = newMilestone.projectId || newMilestone.project;
-    const response = await axios.post(`${API_BASE}/projects/${projId}/milestones`, newMilestone, getAuthHeader());
+    const response = await api.post(`/projects/${projId}/milestones`, newMilestone);
     return response.data.milestone || response.data;
   } catch (err) {
     console.error('Failed to create milestone in database:', err);
@@ -53,7 +46,7 @@ export const updateMilestoneStatus = async (milestoneId, newStatusOrData) => {
       ? { completionStatus: newStatusOrData }
       : newStatusOrData;
 
-    const response = await axios.put(`${API_BASE}/milestones/${milestoneId}`, updatePayload, getAuthHeader());
+    const response = await api.put(`/milestones/${milestoneId}`, updatePayload);
     return response.data.milestone || response.data;
   } catch (err) {
     console.error(`Failed to update milestone ${milestoneId}:`, err);
@@ -68,7 +61,7 @@ export const updateMilestoneStatus = async (milestoneId, newStatusOrData) => {
  */
 export const deleteMilestone = async (milestoneId) => {
   try {
-    await axios.delete(`${API_BASE}/milestones/${milestoneId}`, getAuthHeader());
+    await api.delete(`/milestones/${milestoneId}`);
     return true;
   } catch (err) {
     console.error(`Failed to delete milestone ${milestoneId}:`, err);

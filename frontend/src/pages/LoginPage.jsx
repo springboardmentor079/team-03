@@ -21,12 +21,16 @@ const LoginPage = () => {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  const [errorMessage, setErrorMessage] = useState('');
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errorMessage) setErrorMessage('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMessage('');
     
     try {
       const response = await axios.post('http://localhost:5000/api/auth/login', {
@@ -73,7 +77,7 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error('Login failed:', error);
-      alert(error.response?.data?.message || 'Invalid credentials or server error');
+      setErrorMessage(error.response?.data?.message || 'Invalid credentials or server connection issue.');
     }
   };
 
@@ -84,6 +88,12 @@ const LoginPage = () => {
           <h2 className="fw-bold" style={{ color: '#00c938' }}>BuildTrack</h2>
           <p className="text-muted">Sign in to your account</p>
         </div>
+
+        {errorMessage && (
+          <div className="alert alert-danger p-2 small mb-3 text-center" role="alert">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">

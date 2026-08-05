@@ -11,21 +11,13 @@ const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const [errorMsg, setErrorMsg] = useState('');
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     
     try {
-      // ==========================================
-      // REAL BACKEND CONNECTION (Commented out for now)
-      // ==========================================
-      // const response = await axios.post('http://localhost:5000/api/users/login', {
-      //   email,
-      //   password
-      // });
-      // const { token, user } = response.data;
-      // localStorage.setItem('token', token);
-      // login(user);
-      
       // ==========================================
       // SIMULATED LOGIN (Active for frontend testing)
       // ==========================================
@@ -56,7 +48,7 @@ const Login = () => {
       
     } catch (error) {
       console.error("Login failed:", error);
-      alert(error.response?.data?.message || "An error occurred during login");
+      setErrorMsg(error.response?.data?.message || "An error occurred during authentication.");
     }
   };
 
@@ -82,7 +74,21 @@ const Login = () => {
       }}>
         {/* Title */}
         <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0', color: '#ffffff', textAlign: 'center' }}>Welcome to BuildTrack</h2>
-        <p style={{ color: '#a0a0a0', fontSize: '14px', margin: '0 0 32px 0', textAlign: 'center' }}>Sign in to access your dashboard roster.</p>
+        <p style={{ color: '#a0a0a0', fontSize: '14px', margin: '0 0 24px 0', textAlign: 'center' }}>Sign in to access your dashboard roster.</p>
+
+        {errorMsg && (
+          <div style={{
+            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+            color: '#ef4444',
+            padding: '10px',
+            borderRadius: '6px',
+            fontSize: '13px',
+            marginBottom: '20px',
+            textAlign: 'center'
+          }}>
+            {errorMsg}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '20px' }}>

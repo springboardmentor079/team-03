@@ -1,14 +1,9 @@
-import axios from 'axios';
+import api from './api';
 
-const API_URL = '/api/projects';
+const ENDPOINT = '/projects';
 
 // Explicitly clear legacy local storage key
 localStorage.removeItem('buildtrack_projects');
-
-const getAuthHeader = () => {
-  const token = localStorage.getItem('userToken') || localStorage.getItem('token');
-  return token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-};
 
 /**
  * Fetches all projects directly from the backend MongoDB database.
@@ -16,7 +11,7 @@ const getAuthHeader = () => {
  */
 export const getProjects = async () => {
   try {
-    const response = await axios.get(API_URL, getAuthHeader());
+    const response = await api.get(ENDPOINT);
     const data = Array.isArray(response.data) ? response.data : response.data.projects || [];
     return data.map((p) => ({
       ...p,
@@ -35,7 +30,7 @@ export const getProjects = async () => {
  */
 export const getProjectById = async (id) => {
   try {
-    const response = await axios.get(`${API_URL}/${id}`, getAuthHeader());
+    const response = await api.get(`${ENDPOINT}/${id}`);
     const p = response.data;
     return p ? { ...p, title: p.title || p.name } : null;
   } catch (err) {
@@ -55,7 +50,7 @@ export const createProject = async (newProject) => {
       ...newProject,
       name: newProject.name || newProject.title
     };
-    const response = await axios.post(API_URL, payload, getAuthHeader());
+    const response = await api.post(ENDPOINT, payload);
     const created = response.data.project || response.data;
     return { ...created, title: created.title || created.name };
   } catch (err) {
@@ -76,7 +71,7 @@ export const updateProject = async (id, updatedData) => {
       ...updatedData,
       name: updatedData.name || updatedData.title
     };
-    const response = await axios.put(`${API_URL}/${id}`, payload, getAuthHeader());
+    const response = await api.put(`${ENDPOINT}/${id}`, payload);
     const updated = response.data.project || response.data;
     return { ...updated, title: updated.title || updated.name };
   } catch (err) {
@@ -92,7 +87,7 @@ export const updateProject = async (id, updatedData) => {
  */
 export const deleteProject = async (id) => {
   try {
-    await axios.delete(`${API_URL}/${id}`, getAuthHeader());
+    await api.delete(`${ENDPOINT}/${id}`);
     return true;
   } catch (err) {
     console.error(`Failed to delete project ${id}:`, err);
