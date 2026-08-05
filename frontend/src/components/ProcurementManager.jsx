@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CreatePurchaseOrderForm from './CreatePurchaseOrderForm';
+import DeleteConfirmationModal from './DeleteConfirmationModal';
 import {
   getAllProcurements,
   updateOrderStatus,
@@ -29,6 +30,7 @@ const ProcurementManager = ({ projectId }) => {
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,8 +81,10 @@ const ProcurementManager = ({ projectId }) => {
     }
   };
 
-  const handleDelete = async (orderId) => {
-    if (!window.confirm('Are you sure you want to delete this purchase order?')) return;
+  const handleConfirmDelete = async () => {
+    if (!orderToDelete) return;
+    const orderId = orderToDelete._id;
+    setOrderToDelete(null);
 
     setActionLoadingId(orderId);
     try {
@@ -366,8 +370,8 @@ const ProcurementManager = ({ projectId }) => {
                             <div className="d-flex align-items-center justify-content-end gap-2">
                               <OrderActionButtons order={order} onUpdateStatus={handleStatusChange} />
                               <button
-                                className="btn btn-outline-secondary btn-sm"
-                                onClick={() => handleDelete(order._id)}
+                                className="btn btn-outline-danger btn-sm"
+                                onClick={() => setOrderToDelete(order)}
                                 title="Delete Order"
                               >
                                 🗑
@@ -384,6 +388,15 @@ const ProcurementManager = ({ projectId }) => {
           )}
         </div>
       </div>
+
+      {/* Custom Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        show={!!orderToDelete}
+        title="Delete Purchase Order?"
+        itemName={orderToDelete ? `${orderToDelete.itemName} (${orderToDelete._id})` : ''}
+        onClose={() => setOrderToDelete(null)}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 };

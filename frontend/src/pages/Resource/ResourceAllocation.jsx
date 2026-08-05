@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import DeleteConfirmationModal from '../../components/DeleteConfirmationModal';
 
 const ResourceAllocation = () => {
+  const [resourceToRelease, setResourceToRelease] = useState(null);
   const [allocations, setAllocations] = useState([
     { id: 1, name: 'Tower Crane C1', type: 'Equipment', project: 'Downtown Heights Phase 1', start: '2026-07-01', end: '2026-12-31' },
     { id: 2, name: 'Structural Welding Team (4 Crew)', type: 'Manpower', project: 'Riverfront Luxury Residences', start: '2026-07-10', end: '2026-08-30' },
@@ -47,11 +49,16 @@ const ResourceAllocation = () => {
     });
   };
 
-  const handleDeallocate = (id, name) => {
-    if (window.confirm(`Are you sure you want to release resource "${name}"?`)) {
-      setAllocations(allocations.filter(a => a.id !== id));
-      triggerToast(`Released "${name}" allocation.`);
-    }
+  const handleDeallocateClick = (id, name) => {
+    setResourceToRelease({ id, name });
+  };
+
+  const handleConfirmRelease = () => {
+    if (!resourceToRelease) return;
+    const { id, name } = resourceToRelease;
+    setAllocations(allocations.filter(a => a.id !== id));
+    triggerToast(`Released "${name}" allocation.`);
+    setResourceToRelease(null);
   };
 
   return (
@@ -277,7 +284,7 @@ const ResourceAllocation = () => {
                     </td>
                     <td style={{ padding: '16px', textAlign: 'right' }}>
                       <button
-                        onClick={() => handleDeallocate(alloc.id, alloc.name)}
+                        onClick={() => handleDeallocateClick(alloc.id, alloc.name)}
                         style={{
                           backgroundColor: 'rgba(255,77,77,0.1)',
                           color: '#ff4d4d',
@@ -300,6 +307,15 @@ const ResourceAllocation = () => {
           </div>
         </div>
       </div>
+
+      <DeleteConfirmationModal
+        show={!!resourceToRelease}
+        title="Release Resource Allocation?"
+        itemName={resourceToRelease?.name || ''}
+        confirmText="Release"
+        onClose={() => setResourceToRelease(null)}
+        onConfirm={handleConfirmRelease}
+      />
     </div>
   );
 };
