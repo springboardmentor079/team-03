@@ -9,8 +9,8 @@ const createPurchaseOrder = async (req, res) => {
       vendorName,
       category,
       totalAmount,
-      status, // optional — schema defaults to 'Requested' if omitted
-      requestedBy: req.user.id, // taken from the verified JWT, never trusted from the request body
+      status,
+      requestedBy: req.user.id,
     });
 
     res.status(201).json(procurement);
@@ -23,7 +23,7 @@ const getAllProcurements = async (req, res) => {
   try {
     const procurements = await Procurement.find()
       .populate('projectId')
-      .populate('requestedBy', '-password'); // exclude password hash if User model has one
+      .populate('requestedBy', '-password');
     res.status(200).json(procurements);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -36,8 +36,8 @@ const updateProcurement = async (req, res) => {
       req.params.id,
       req.body,
       {
-        returnDocument: 'after',           // Return the updated document
-        runValidators: true, // ENFORCES SCHEMA VALIDATION ON UPDATES
+        returnDocument: 'after',
+        runValidators: true,
       }
     );
 
@@ -50,6 +50,36 @@ const updateProcurement = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
+const ALLOWED_STATUSES = ['Pending Approval', 'Approved', 'Ordered', 'Delivered'];
+
+const updateProcurementStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!ALLOWED_STATUSES.includes(status)) {
+      return res.status(400).json({
+        message: `Invalid status. Must be one of: ${ALLOWED_STATUSES.join(', ')}`,
+      });
+    }
+
+    const procurement = await Procurement.findByIdAndUpdate(
+      id,
+      { status },
+      { returnDocument: 'after', runValidators: true }
+    );
+
+    if (!procurement) {
+      return res.status(404).json({ message: 'Procurement record not found' });
+    }
+
+    res.status(200).json(procurement);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
 const deleteProcurementOrder = async (req, res) => {
   try {
     const deleted = await Procurement.findByIdAndDelete(req.params.id);
@@ -67,4 +97,5 @@ module.exports = {
   getAllProcurements,
   updateProcurement,
   deleteProcurementOrder,
+  updateProcurementStatus,
 };

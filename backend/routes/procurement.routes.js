@@ -7,11 +7,13 @@ const {
   getAllProcurements,
   updateProcurement,
   deleteProcurementOrder,
+  updateProcurementStatus,
 } = require('../controllers/procurement.controller');
 
 router.get('/', authMiddleware, getAllProcurements);
 router.post('/', authMiddleware, authorizeRoles('Administrator', 'Project Manager'), createPurchaseOrder);
 router.put('/:id', authMiddleware, updateProcurement);
 router.delete('/:id', authMiddleware, deleteProcurementOrder);
+router.put('/:id/status', authMiddleware, authorizeRoles('Administrator', 'Project Manager'), updateProcurementStatus);
 
 module.exports = router;

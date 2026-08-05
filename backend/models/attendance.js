@@ -1,35 +1,35 @@
-// models/Attendance.js
 const mongoose = require('mongoose');
 
 const attendanceSchema = new mongoose.Schema({
-  worker: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Worker',
-    required: [true, 'Attendance must be linked to a registered worker']
+    ref: 'User',
+    required: true
   },
-  project: {
+  projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
-    required: [true, 'Site location project reference is required']
+    required: true
   },
   date: {
     type: Date,
-    required: [true, 'Attendance date record is required'],
+    required: true,
     default: Date.now
   },
   status: {
     type: String,
-    enum: ['Present', 'Absent', 'Half Day', 'Late'],
+    enum: ['Present', 'Absent', 'Leave', 'Half Day'],
     required: true
   },
-  shift: {
+  remarks: {
     type: String,
-    enum: ['Day', 'Night'],
-    default: 'Day'
+    trim: true
   }
-});
+}, { timestamps: true });
 
-// Enforces a strict rule: A worker can only have one attendance entry per day per project
-attendanceSchema.index({ worker: 1, project: 1, date: 1 }, { unique: true });
+// Task 3: Compound index for project daily attendance lookup
+attendanceSchema.index({ projectId: 1, date: -1, status: 1 });
+// Task 3: Compound index for individual user record queries
+attendanceSchema.index({ userId: 1, date: -1 });
 
 module.exports = mongoose.model('Attendance', attendanceSchema);

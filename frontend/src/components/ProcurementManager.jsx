@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import CreatePurchaseOrderForm from './CreatePurchaseOrderForm';
-import DeleteConfirmationModal from './DeleteConfirmationModal';
 import {
   getAllProcurements,
+  updateOrderStatus,
   updateProcurementStatus,
   deleteProcurementOrder
 } from '../services/procurementService';
 import { useAuth } from '../context/auth';
+import OrderStatusBadge from './OrderStatusBadge';
+import OrderActionButtons from './OrderActionButtons';
 
 const CATEGORIES = [
   'All',
@@ -27,13 +29,6 @@ const ProcurementManager = ({ projectId }) => {
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-
-  // Delete Confirmation Modal State
-  const [deleteModalState, setDeleteModalState] = useState({
-    show: false,
-    orderId: null,
-    itemName: ''
-  });
 
   // Search & Filter State
   const [searchTerm, setSearchTerm] = useState('');
@@ -84,24 +79,13 @@ const ProcurementManager = ({ projectId }) => {
     }
   };
 
-  const promptDelete = (order) => {
-    setDeleteModalState({
-      show: true,
-      orderId: order._id,
-      itemName: `${order.itemName} (${order._id})`
-    });
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!deleteModalState.orderId) return;
-
-    const orderId = deleteModalState.orderId;
-    setDeleteModalState({ show: false, orderId: null, itemName: '' });
+  const handleDelete = async (orderId) => {
+    if (!window.confirm('Are you sure you want to delete this purchase order?')) return;
 
     setActionLoadingId(orderId);
     try {
       await deleteProcurementOrder(orderId);
-      setToastMessage(`Purchase order #${orderId} deleted successfully.`);
+      setToastMessage(`Purchase order #${orderId} deleted.`);
       await fetchOrders();
     } catch (err) {
       console.error('Failed to delete order:', err);
@@ -371,19 +355,24 @@ const ProcurementManager = ({ projectId }) => {
                           </div>
                         </td>
 
-                        <td>{getStatusBadge(order.status)}</td>
+                        <td>
+                          <OrderStatusBadge status={order.status} />
+                        </td>
 
                         <td className="text-end pe-4">
                           {isUpdating ? (
                             <div className="spinner-border spinner-border-sm text-primary" role="status"></div>
                           ) : (
-                            <button
-                              className="btn btn-outline-danger btn-sm fw-semibold"
-                              onClick={() => promptDelete(order)}
-                              title="Delete Purchase Order"
-                            >
-                              🗑 Delete
-                            </button>
+                            <div className="d-flex align-items-center justify-content-end gap-2">
+                              <OrderActionButtons order={order} onUpdateStatus={handleStatusChange} />
+                              <button
+                                className="btn btn-outline-secondary btn-sm"
+                                onClick={() => handleDelete(order._id)}
+                                title="Delete Order"
+                              >
+                                🗑
+                              </button>
+                            </div>
                           )}
                         </td>
                       </tr>
@@ -395,15 +384,6 @@ const ProcurementManager = ({ projectId }) => {
           )}
         </div>
       </div>
-
-      {/* Custom Delete Confirmation Modal */}
-      <DeleteConfirmationModal
-        show={deleteModalState.show}
-        title="Delete Purchase Order?"
-        itemName={deleteModalState.itemName}
-        onClose={() => setDeleteModalState({ show: false, orderId: null, itemName: '' })}
-        onConfirm={handleConfirmDelete}
-      />
     </div>
   );
 };

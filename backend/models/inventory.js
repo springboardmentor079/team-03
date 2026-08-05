@@ -1,32 +1,36 @@
-// models/Inventory.js
 const mongoose = require('mongoose');
 
 const inventorySchema = new mongoose.Schema({
-  materialName: {
-    type: String,
-    required: [true, 'Material name is required'],
-    // Enforces the exact material categories from the specifications document
-    enum: ['Cement', 'Steel', 'Bricks', 'Sand', 'Concrete', 'Electrical Materials', 'Plumbing Materials']
-  },
-  project: {
+  projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
-    required: [true, 'Inventory items must be allocated to a project site']
+    required: true
   },
-  quantityAvailable: {
-    type: Number,
-    required: [true, 'Stock quantity is required'],
-    min: [0, 'Quantity cannot be negative']
-  },
-  unitOfMeasurement: {
+  itemName: {
     type: String,
-    required: [true, 'Unit (e.g., Bags, Tons, Units) is required'],
+    required: true,
     trim: true
   },
-  lastUpdated: {
-    type: Date,
-    default: Date.now
+  quantity: {
+    type: Number,
+    required: true,
+    min: 0,
+    default: 0
+  },
+  unit: {
+    type: String,
+    required: true, // e.g., 'kg', 'bags', 'units', 'meters'
+    trim: true
+  },
+  reorderLevel: {
+    type: Number,
+    required: true,
+    min: 0,
+    default: 10
   }
-});
+}, { timestamps: true });
+
+// Task 3: Compound index for project stock searching
+inventorySchema.index({ projectId: 1, itemName: 1 });
 
 module.exports = mongoose.model('Inventory', inventorySchema);
