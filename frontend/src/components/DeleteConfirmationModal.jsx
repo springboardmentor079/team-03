@@ -1,20 +1,33 @@
 import React from 'react';
 
 /**
- * A premium custom confirmation modal for deleting projects or milestones.
+ * A premium custom confirmation modal for deleting items.
  * @param {Object} props
  * @param {boolean} props.show Whether the modal is open.
- * @param {string} [props.title] Modal header title (e.g. "Delete Milestone?").
+ * @param {string} [props.title] Modal header title (e.g. "Delete Purchase Order?").
  * @param {string} [props.projectName] The name of the project or item being deleted.
  * @param {string} [props.itemName] Alternative property name for item title.
+ * @param {React.ReactNode} [props.message] Custom message content.
+ * @param {string} [props.confirmText] Label for confirm button.
+ * @param {string} [props.cancelText] Label for cancel button.
  * @param {Function} props.onClose Callback when user cancels or closes modal.
  * @param {Function} props.onConfirm Callback when user confirms deletion.
  */
-const DeleteConfirmationModal = ({ show, title, projectName, itemName, onClose, onConfirm }) => {
+const DeleteConfirmationModal = ({
+  show,
+  title,
+  projectName,
+  itemName,
+  message,
+  confirmText = 'Delete',
+  cancelText = 'Cancel',
+  onClose,
+  onConfirm
+}) => {
   if (!show) return null;
 
   const displayName = itemName || projectName || '';
-  const modalTitle = title || (itemName ? 'Delete Milestone?' : 'Delete Project?');
+  const modalTitle = title || (displayName ? `Delete "${displayName}"?` : 'Confirm Deletion');
 
   return (
     <div 
@@ -26,8 +39,14 @@ const DeleteConfirmationModal = ({ show, title, projectName, itemName, onClose, 
         backdropFilter: 'blur(5px)', 
         zIndex: 1060 
       }}
+      onClick={onClose}
     >
-      <div className="modal-dialog modal-dialog-centered" role="document" style={{ maxWidth: '450px' }}>
+      <div 
+        className="modal-dialog modal-dialog-centered" 
+        role="document" 
+        style={{ maxWidth: '450px' }}
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
           
           {/* Top Danger Accent Bar */}
@@ -54,7 +73,13 @@ const DeleteConfirmationModal = ({ show, title, projectName, itemName, onClose, 
             {/* Content */}
             <h4 className="fw-bold text-dark mb-2">{modalTitle}</h4>
             <p className="text-secondary mb-4 px-2" style={{ fontSize: '14.5px', lineHeight: '1.5' }}>
-              Are you sure you want to delete <strong className="text-dark">"{displayName}"</strong>? This action is permanent and cannot be undone.
+              {message ? (
+                message
+              ) : displayName ? (
+                <>Are you sure you want to delete <strong className="text-dark">"{displayName}"</strong>? This action is permanent and cannot be undone.</>
+              ) : (
+                'Are you sure you want to delete this item? This action is permanent and cannot be undone.'
+              )}
             </p>
 
             {/* Buttons */}
@@ -65,7 +90,7 @@ const DeleteConfirmationModal = ({ show, title, projectName, itemName, onClose, 
                 style={{ borderRadius: '8px', minWidth: '110px' }}
                 onClick={onClose}
               >
-                Cancel
+                {cancelText}
               </button>
               <button 
                 type="button" 
@@ -78,7 +103,7 @@ const DeleteConfirmationModal = ({ show, title, projectName, itemName, onClose, 
                 }}
                 onClick={onConfirm}
               >
-                Delete
+                {confirmText}
               </button>
             </div>
 

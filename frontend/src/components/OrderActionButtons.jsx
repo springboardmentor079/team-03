@@ -7,8 +7,10 @@ import { useAuth } from '../context/auth';
  * 
  * Rules:
  * 1. Orders requested by a Project Manager MUST be approved by an Administrator.
+ *    - If a Project Manager places an order, they have no rights to approve or reject it.
+ *    - For Project Managers (or non-Admins), it displays "🔒 Waiting Admin's Approval".
  * 2. Orders requested by a Site Engineer can be approved by a Project Manager or Administrator.
- * 3. Four-Eyes Principle: Users cannot approve their own orders.
+ * 3. Four-Eyes Principle: Users cannot approve their own self-submitted orders.
  * 
  * @param {Object} props
  * @param {Object} props.order - Purchase order object
@@ -28,55 +30,62 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
 
   // Order Creator metadata
   const orderCreator = (order.createdBy || order.requestedBy || '').toLowerCase();
-  const orderCreatorRole = order.createdByRole || (orderCreator.includes('engineer') ? 'Site Engineer' : 'Project Manager');
-  const isSelfOrder = currentUserName && orderCreator && currentUserName === orderCreator;
+  const orderCreatorRole = 
+    order.createdByRole || 
+    (orderCreator.includes('engineer') ? 'Site Engineer' : 
+     (orderCreator.includes('manager') || orderCreator.includes('sarah') || orderCreator.includes('project') ? 'Project Manager' : 
+     'Project Manager'));
 
-  // Site Engineers cannot alter order status
-  if (!isApproverRole) {
-    if (order.status === 'Pending Approval') {
-      return (
-        <span className="badge bg-secondary p-2 text-wrap" style={{ fontSize: '0.75rem' }}>
-          Awaiting Manager Review
-        </span>
-      );
-    }
-    return null;
-  }
+  const isSelfOrder = Boolean(currentUserName && orderCreator && currentUserName === orderCreator);
 
   switch (order.status) {
     case 'Pending Approval':
-      // 1. Four-Eyes Principle: Cannot approve your own self-submitted order
+      // 1. Hierarchy Rule: PM-created orders MUST be approved by an Admin.
+      // If order was created by a Project Manager and current user is NOT an Admin:
+      if (orderCreatorRole === 'Project Manager' && !isAdmin) {
+        return (
+          <span
+            className="badge bg-warning text-dark border text-wrap shadow-sm fw-bold"
+            title="Project Manager orders require Administrator approval"
+            style={{ fontSize: '11.5px', padding: '4px 8px', lineHeight: '1.2' }}
+          >
+            🔒 Waiting Admin's Approval
+          </span>
+        );
+      }
+
+      // 2. Four-Eyes Principle: Cannot approve your own self-submitted order
       if (isSelfOrder) {
         return (
           <span
-            className="badge bg-warning text-dark border p-2 text-wrap"
+            className="badge bg-warning text-dark border text-wrap fw-bold"
             title="Four-Eyes Principle: Cannot approve your own order"
-            style={{ fontSize: '0.75rem' }}
+            style={{ fontSize: '11.5px', padding: '4px 8px', lineHeight: '1.2' }}
           >
             🔒 Self-Submitted (Awaiting 2nd Eye)
           </span>
         );
       }
 
-      // 2. Hierarchy Rule: PM-created orders MUST be approved by an Admin
-      if (orderCreatorRole === 'Project Manager' && !isAdmin) {
+      // 3. Site Engineers (non-approvers) cannot alter order status
+      if (!isApproverRole) {
         return (
           <span
-            className="badge bg-danger text-white border p-2 text-wrap"
-            title="Project Manager orders require Administrator approval"
-            style={{ fontSize: '0.75rem' }}
+            className="badge bg-secondary text-wrap"
+            style={{ fontSize: '11.5px', padding: '4px 8px', lineHeight: '1.2' }}
           >
-            🔒 Requires Admin Approval
+            Awaiting Manager Review
           </span>
         );
       }
 
-      // 3. User is authorized to Approve / Reject
+      // 4. Authorized Approver (PM approving SE order, or Admin approving PM/SE order)
       return (
         <div className="btn-group btn-group-sm" role="group">
           <button
             type="button"
             className="btn btn-success btn-sm fw-semibold"
+            style={{ padding: '4px 10px', fontSize: '12px', lineHeight: '1.3' }}
             onClick={() => onUpdateStatus(order._id, 'Approved')}
           >
             ✓ Approve
@@ -84,6 +93,7 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
           <button
             type="button"
             className="btn btn-outline-danger btn-sm fw-semibold ms-1"
+            style={{ padding: '4px 10px', fontSize: '12px', lineHeight: '1.3' }}
             onClick={() => onUpdateStatus(order._id, 'Rejected')}
           >
             ✕ Reject
@@ -96,6 +106,7 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
         <button
           type="button"
           className="btn btn-info btn-sm text-dark fw-semibold"
+          style={{ padding: '4px 10px', fontSize: '12px', lineHeight: '1.3' }}
           onClick={() => onUpdateStatus(order._id, 'Ordered')}
         >
           Mark Ordered
@@ -107,6 +118,7 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
         <button
           type="button"
           className="btn btn-primary btn-sm fw-semibold"
+          style={{ padding: '4px 10px', fontSize: '12px', lineHeight: '1.3' }}
           onClick={() => onUpdateStatus(order._id, 'Delivered')}
         >
           Mark Delivered
