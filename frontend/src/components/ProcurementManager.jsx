@@ -402,6 +402,7 @@ const ProcurementManager = ({ projectId }) => {
                                     className="btn btn-outline-danger btn-sm"
                                     onClick={() => setOrderToDelete(order)}
                                     title="Delete Order"
+                                    style={{ padding: '4px 8px', fontSize: '12px', lineHeight: '1.2' }}
                                   >
                                     🗑
                                   </button>

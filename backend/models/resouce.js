@@ -1,35 +1,30 @@
-// models/Resource.js
 const mongoose = require('mongoose');
 
 const resourceSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Resource name is required'],
-    trim: true
-  },
-  category: {
-    type: String,
-    required: [true, 'Resource category is required'],
-    // Enforces the exact categories from the specifications document
-    enum: ['Excavators', 'Concrete Mixers', 'Cranes', 'Dump Trucks', 'Generators', 'Safety Equipment']
-  },
-  currentProject: {
+  projectId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Project',
-    default: null // Null means it's available in the central yard
+    required: true
+  },
+  resourceName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  type: {
+    type: String,
+    enum: ['Heavy Machinery', 'Vehicle', 'Tooling', 'Safety Gear', 'IT Equipment'],
+    required: true
   },
   availabilityStatus: {
     type: String,
-    enum: ['Available', 'Allocated', 'Under Maintenance'],
-    default: 'Available'
-  },
-  nextMaintenanceDate: {
-    type: Date
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+    enum: ['Available', 'In Use', 'Under Maintenance', 'Decommissioned'],
+    default: 'Available',
+    required: true
   }
-});
+}, { timestamps: true });
+
+// Task 3: Compound index for project resource availability queries
+resourceSchema.index({ projectId: 1, availabilityStatus: 1 });
 
 module.exports = mongoose.model('Resource', resourceSchema);

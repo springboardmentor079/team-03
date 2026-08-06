@@ -45,9 +45,9 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
       if (orderCreatorRole === 'Project Manager' && !isAdmin) {
         return (
           <span
-            className="badge bg-warning text-dark border p-2 text-wrap shadow-sm fw-bold"
+            className="badge bg-warning text-dark border text-wrap shadow-sm fw-bold"
             title="Project Manager orders require Administrator approval"
-            style={{ fontSize: '0.75rem' }}
+            style={{ fontSize: '11.5px', padding: '4px 8px', lineHeight: '1.2' }}
           >
             🔒 Waiting Admin's Approval
           </span>
@@ -58,9 +58,9 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
       if (isSelfOrder) {
         return (
           <span
-            className="badge bg-warning text-dark border p-2 text-wrap fw-bold"
+            className="badge bg-warning text-dark border text-wrap fw-bold"
             title="Four-Eyes Principle: Cannot approve your own order"
-            style={{ fontSize: '0.75rem' }}
+            style={{ fontSize: '11.5px', padding: '4px 8px', lineHeight: '1.2' }}
           >
             🔒 Self-Submitted (Awaiting 2nd Eye)
           </span>
@@ -70,7 +70,10 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
       // 3. Site Engineers (non-approvers) cannot alter order status
       if (!isApproverRole) {
         return (
-          <span className="badge bg-secondary p-2 text-wrap" style={{ fontSize: '0.75rem' }}>
+          <span
+            className="badge bg-secondary text-wrap"
+            style={{ fontSize: '11.5px', padding: '4px 8px', lineHeight: '1.2' }}
+          >
             Awaiting Manager Review
           </span>
         );
@@ -82,6 +85,7 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
           <button
             type="button"
             className="btn btn-success btn-sm fw-semibold"
+            style={{ padding: '4px 10px', fontSize: '12px', lineHeight: '1.3' }}
             onClick={() => onUpdateStatus(order._id, 'Approved')}
           >
             ✓ Approve
@@ -89,6 +93,7 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
           <button
             type="button"
             className="btn btn-outline-danger btn-sm fw-semibold ms-1"
+            style={{ padding: '4px 10px', fontSize: '12px', lineHeight: '1.3' }}
             onClick={() => onUpdateStatus(order._id, 'Rejected')}
           >
             ✕ Reject
@@ -101,6 +106,7 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
         <button
           type="button"
           className="btn btn-info btn-sm text-dark fw-semibold"
+          style={{ padding: '4px 10px', fontSize: '12px', lineHeight: '1.3' }}
           onClick={() => onUpdateStatus(order._id, 'Ordered')}
         >
           Mark Ordered
@@ -112,6 +118,7 @@ const OrderActionButtons = ({ order, user: userProp, onUpdateStatus }) => {
         <button
           type="button"
           className="btn btn-primary btn-sm fw-semibold"
+          style={{ padding: '4px 10px', fontSize: '12px', lineHeight: '1.3' }}
           onClick={() => onUpdateStatus(order._id, 'Delivered')}
         >
           Mark Delivered

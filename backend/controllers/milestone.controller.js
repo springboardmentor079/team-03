@@ -1,4 +1,4 @@
-const Milestone = require('../models/projectmilestone');
+const Milestone = require('../models/milestone');
 
 exports.createMilestone = async (req, res) => {
   try {

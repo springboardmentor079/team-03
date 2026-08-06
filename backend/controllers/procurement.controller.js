@@ -9,8 +9,8 @@ const createPurchaseOrder = async (req, res) => {
       vendorName,
       category,
       totalAmount,
-      status, // optional — schema defaults to 'Requested' if omitted
-      requestedBy: req.user.id, // taken from the verified JWT, never trusted from the request body
+      status,
+      requestedBy: req.user.id,
     });
 
     res.status(201).json(procurement);
@@ -22,20 +22,36 @@ const createPurchaseOrder = async (req, res) => {
 const getAllProcurements = async (req, res) => {
   try {
     const procurements = await Procurement.find()
-      .populate('project')
-      .populate('requestedBy', '-password'); // exclude password hash if User model has one
+      .populate('projectId')
+      .populate('requestedBy', '-password');
     res.status(200).json(procurements);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
 
-// NOTE: Task doc listed a different enum ("Pending Approval", "Approved", "Ordered",
-// "Delivered") than the actual procurement.js schema enum below. Validating against
-// the doc's list would let requests through here only to fail Mongoose's own schema
-// validation with a confusing error. Using the real schema enum until Austin/Stalin
-// confirm which one is correct — swap this array if the schema changes.
-const ALLOWED_STATUSES = ['Requested', 'Ordered', 'Invoiced', 'Delivered', 'Cancelled'];
+const updateProcurement = async (req, res) => {
+  try {
+    const updatedProcurement = await Procurement.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        returnDocument: 'after',
+        runValidators: true,
+      }
+    );
+
+    if (!updatedProcurement) {
+      return res.status(404).json({ message: 'Procurement order not found' });
+    }
+
+    res.status(200).json(updatedProcurement);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const ALLOWED_STATUSES = ['Pending Approval', 'Approved', 'Ordered', 'Delivered'];
 
 const updateProcurementStatus = async (req, res) => {
   try {
@@ -80,9 +96,23 @@ const deleteProcurement = async (req, res) => {
   }
 };
 
+const deleteProcurementOrder = async (req, res) => {
+  try {
+    const deleted = await Procurement.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Procurement order not found' });
+    }
+    res.status(200).json({ message: 'Order deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   createPurchaseOrder,
   getAllProcurements,
+  updateProcurement,
+  deleteProcurementOrder,
   updateProcurementStatus,
   deleteProcurement,
 };
