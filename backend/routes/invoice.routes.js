@@ -5,33 +5,25 @@ const authMiddleware = require('../middleware/auth');
 const { authorizeRoles } = require('../middleware/roleMiddleware');
 
 const {
-  createPurchaseOrder,
-  getAllProcurements,
-  updateProcurementStatus,
-  deleteProcurement,
-} = require('../controllers/procurement.controller');
+  getAllInvoices,
+  createInvoice,
+  updateInvoiceStatus,
+} = require('../controllers/invoice.controller');
 
-router.get('/', authMiddleware, getAllProcurements);
+router.get('/', authMiddleware, getAllInvoices);
 
 router.post(
   '/',
   authMiddleware,
   authorizeRoles('Administrator', 'Project Manager'),
-  createPurchaseOrder
+  createInvoice
 );
 
 router.put(
   '/:id/status',
   authMiddleware,
   authorizeRoles('Administrator', 'Project Manager'),
-  updateProcurementStatus
-);
-
-router.delete(
-  '/:id',
-  authMiddleware,
-  authorizeRoles('Administrator', 'Project Manager'),
-  deleteProcurement
+  updateInvoiceStatus
 );
 
 module.exports = router;
