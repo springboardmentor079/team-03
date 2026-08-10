@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import NotificationCenter from '../components/NotificationCenter';
 import './Dashboard.css';
 
 function Dashboard() {
   const [activeLink, setActiveLink] = useState('Dashboard');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [notificationCount, setNotificationCount] = useState(3);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   const menuItems = [
     {
@@ -153,74 +152,8 @@ function Dashboard() {
               />
             </div>
 
-            {/* Notification Bell */}
-            <div style={{ position: 'relative' }}>
-              <button
-                className="notification-bell-btn"
-                onClick={() => setShowNotifications(!showNotifications)}
-                aria-label="View notifications"
-              >
-                <svg viewBox="0 0 24 24">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                </svg>
-                {notificationCount > 0 && (
-                  <div className="notification-dot">
-                    <span className="notification-dot-inner">{notificationCount}</span>
-                  </div>
-                )}
-              </button>
-
-              {/* Notification Dropdown (Micro-interaction) */}
-              {showNotifications && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '50px',
-                    right: 0,
-                    width: '300px',
-                    backgroundColor: '#ffffff',
-                    borderRadius: '8px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                    border: '1px solid #e2e8f0',
-                    padding: '16px',
-                    zIndex: 100,
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                    <h3 style={{ fontSize: '14px', fontWeight: '700' }}>Recent Notifications</h3>
-                    <button
-                      onClick={clearNotifications}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#00c938',
-                        fontSize: '11px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Clear All
-                    </button>
-                  </div>
-                  {notificationCount > 0 ? (
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      <li style={{ fontSize: '12px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-                        <strong>Critical Warning:</strong> Storage Capacity at 85%.
-                      </li>
-                      <li style={{ fontSize: '12px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-                        <strong>Active Workforce:</strong> Allocation reached 91% today.
-                      </li>
-                      <li style={{ fontSize: '12px' }}>
-                        <strong>System Alert:</strong> Server CPU Load reached 62%.
-                      </li>
-                    </ul>
-                  ) : (
-                    <p style={{ fontSize: '12px', color: '#64748b', textAlign: 'center' }}>No new notifications</p>
-                  )}
-                </div>
-              )}
-            </div>
+            {/* Notification Center */}
+            <NotificationCenter />
 
             {/* Profile Dropdown */}
             <div style={{ position: 'relative' }}>

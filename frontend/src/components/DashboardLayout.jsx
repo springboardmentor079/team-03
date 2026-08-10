@@ -4,14 +4,14 @@ import { useAuth } from '../context/auth';
 import LogoutConfirmationModal from './LogoutConfirmationModal';
 import '../pages/Dashboards/AdminDashboard.css';
 
+import NotificationCenter from './NotificationCenter';
+
 const DashboardLayout = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [notificationCount, setNotificationCount] = useState(3);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Determine active link based on current path
@@ -23,6 +23,8 @@ const DashboardLayout = () => {
   if (currentPath.includes('workforce')) activeLink = 'Workforce';
   if (currentPath.includes('resources')) activeLink = 'Resources';
   if (currentPath.includes('analytics')) activeLink = 'Analytics';
+  if (currentPath.includes('reports')) activeLink = 'Reports';
+  if (currentPath.includes('documents')) activeLink = 'Documents';
 
   const getDashboardPath = () => {
     if (!user) return '/';
@@ -125,6 +127,28 @@ const DashboardLayout = () => {
             <line x1="6" y1="20" x2="6" y2="14"></line>
           </svg>
         )
+      },
+      {
+        name: 'Reports',
+        path: '/dashboard/reports',
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        )
+      },
+      {
+        name: 'Documents',
+        path: '/dashboard/documents',
+        icon: (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+          </svg>
+        )
       }
     ] : [])
   ];
@@ -214,74 +238,8 @@ const DashboardLayout = () => {
               />
             </div>
 
-            {/* Notification Bell */}
-            <div style={{ position: 'relative' }}>
-              <button
-                className="notification-bell-btn"
-                onClick={() => setShowNotifications(!showNotifications)}
-                aria-label="View notifications"
-              >
-                <svg viewBox="0 0 24 24">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                </svg>
-                {notificationCount > 0 && (
-                  <div className="notification-dot">
-                    <span className="notification-dot-inner">{notificationCount}</span>
-                  </div>
-                )}
-              </button>
-
-              {/* Notification Dropdown */}
-              {showNotifications && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '50px',
-                    right: 0,
-                    width: '300px',
-                    backgroundColor: '#ffffff',
-                    borderRadius: '8px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-                    border: '1px solid #e2e8f0',
-                    padding: '16px',
-                    zIndex: 100,
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                    <h3 style={{ fontSize: '14px', fontWeight: '700' }}>Recent Notifications</h3>
-                    <button
-                      onClick={clearNotifications}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: '#00c938',
-                        fontSize: '11px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Clear All
-                    </button>
-                  </div>
-                  {notificationCount > 0 ? (
-                    <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      <li style={{ fontSize: '12px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-                        <strong>Critical Warning:</strong> Storage Capacity at 85%.
-                      </li>
-                      <li style={{ fontSize: '12px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-                        <strong>Active Workforce:</strong> Allocation reached 91% today.
-                      </li>
-                      <li style={{ fontSize: '12px' }}>
-                        <strong>System Alert:</strong> Server CPU Load reached 62%.
-                      </li>
-                    </ul>
-                  ) : (
-                    <p style={{ fontSize: '12px', color: '#64748b', textAlign: 'center' }}>No new notifications</p>
-                  )}
-                </div>
-              )}
-            </div>
+            {/* Notification Center */}
+            <NotificationCenter />
 
             {/* Profile Dropdown */}
             <div style={{ position: 'relative' }}>

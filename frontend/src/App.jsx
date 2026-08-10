@@ -36,6 +36,8 @@ const ProjectForm = lazy(() => import('./pages/ProjectForm'));
 const MilestoneTracker = lazy(() => import('./pages/MilestoneTracker'));
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
 const WorkforcePage = lazy(() => import('./pages/WorkforcePage'));
+const ReportsPage = lazy(() => import('./pages/ReportsPage'));
+const DocumentPage = lazy(() => import('./pages/DocumentPage'));
 
 const PageLoader = () => (
   <div className="d-flex align-items-center justify-content-center min-vh-100 bg-light">
@@ -111,6 +113,11 @@ function App() {
             <Route path="/dashboard/analytics/progress" element={<ProjectProgress />} />
             <Route path="/dashboard/analytics/resources" element={<ResourceAnalytics />} />
             <Route path="/dashboard/analytics/procurement" element={<ProcurementAnalytics />} />
+
+            <Route path="/dashboard/reports" element={<ReportsPage />} />
+            <Route path="/dashboard/documents" element={<DocumentPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/documents" element={<DocumentPage />} />
           </Route>
           
         </Route>
