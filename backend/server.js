@@ -14,6 +14,8 @@ const workforceRoutes = require('./routes/workforce.routes');
 const procurementRoutes = require('./routes/procurement.routes');
 const vendorRoutes = require('./routes/vendor.routes');
 const invoiceRoutes = require('./routes/invoice.routes');
+const expenseRoutes = require('./routes/expense.routes');
+
 
 
    // ← added
@@ -40,6 +42,7 @@ app.use('/api/workforce', workforceRoutes);
 app.use('/api/procurements', procurementRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/invoices', invoiceRoutes);
+app.use('/api/expenses', expenseRoutes);
 
 // MongoDB Connection and Server Start
 const PORT = process.env.PORT || 5000;
