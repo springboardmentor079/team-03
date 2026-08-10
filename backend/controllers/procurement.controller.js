@@ -1,43 +1,21 @@
-const mongoose = require('mongoose');
 const Procurement = require('../models/procurement');
-
-const ALLOWED_STATUSES = [
-  'Pending Approval',
-  'Approved',
-  'Ordered',
-  'Delivered',
-];
 
 const createPurchaseOrder = async (req, res) => {
   try {
-    const {
-      projectId,
-      vendorName,
-      itemName,
-      quantity,
-      estimatedCost,
-      procurementCategory,
-      status,
-    } = req.body;
-
-    if (!mongoose.isValidObjectId(projectId)) {
-      return res.status(400).json({ message: 'Invalid project ID' });
-    }
+    const { project, vendorName, category, totalAmount, status } = req.body;
 
     const procurement = await Procurement.create({
-      projectId,
+      project,
       vendorName,
-      itemName,
-      quantity,
-      estimatedCost,
-      procurementCategory,
+      category,
+      totalAmount,
       status,
       requestedBy: req.user.id,
     });
 
-    return res.status(201).json(procurement);
+    res.status(201).json(procurement);
   } catch (err) {
-    return res.status(400).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
@@ -46,15 +24,38 @@ const getAllProcurements = async (req, res) => {
     const procurements = await Procurement.find()
       .populate('projectId')
       .populate('requestedBy', '-password');
-
-    return res.status(200).json(procurements);
+    res.status(200).json(procurements);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
+const updateProcurement = async (req, res) => {
+  try {
+    const updatedProcurement = await Procurement.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        returnDocument: 'after',
+        runValidators: true,
+      }
+    );
+
+    if (!updatedProcurement) {
+      return res.status(404).json({ message: 'Procurement order not found' });
+    }
+
+    res.status(200).json(updatedProcurement);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+const ALLOWED_STATUSES = ['Pending Approval', 'Approved', 'Ordered', 'Delivered'];
+
 const updateProcurementStatus = async (req, res) => {
   try {
+    const { id } = req.params;
     const { status } = req.body;
 
     if (!ALLOWED_STATUSES.includes(status)) {
@@ -64,41 +65,37 @@ const updateProcurementStatus = async (req, res) => {
     }
 
     const procurement = await Procurement.findByIdAndUpdate(
-      req.params.id,
+      id,
       { status },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     );
 
     if (!procurement) {
       return res.status(404).json({ message: 'Procurement record not found' });
     }
 
-    return res.status(200).json(procurement);
+    res.status(200).json(procurement);
   } catch (err) {
-    return res.status(400).json({ message: err.message });
+    res.status(400).json({ message: err.message });
   }
 };
 
-const deleteProcurement = async (req, res) => {
+const deleteProcurementOrder = async (req, res) => {
   try {
-    const procurement = await Procurement.findByIdAndDelete(req.params.id);
-
-    if (!procurement) {
-      return res.status(404).json({ message: 'Procurement record not found' });
+    const deleted = await Procurement.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+      return res.status(404).json({ message: 'Procurement order not found' });
     }
-
-    return res.status(200).json({
-      message: 'Procurement record deleted successfully',
-      deletedId: procurement._id,
-    });
+    res.status(200).json({ message: 'Order deleted successfully' });
   } catch (err) {
-    return res.status(400).json({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
 module.exports = {
   createPurchaseOrder,
   getAllProcurements,
+  updateProcurement,
+  deleteProcurementOrder,
   updateProcurementStatus,
-  deleteProcurement,
 };

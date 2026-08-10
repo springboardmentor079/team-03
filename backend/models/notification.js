@@ -1,35 +1,36 @@
-// models/Notification.js
 const mongoose = require('mongoose');
 
-const notificationSchema = new mongoose.Schema({
-  recipient: {
-    type: mongoose.Schema.Types.ObjectId, // Links to a specific User recipient
-    ref: 'User',
-    required: [true, 'Notification must target a recipient user']
+const notificationSchema = new mongoose.Schema(
+  {
+    recipient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    type: {
+      type: String,
+      enum: ['INFO', 'WARNING', 'ALERT', 'DOCUMENT_UPLOADED'],
+      default: 'INFO',
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
+    linkUrl: {
+      type: String,
+    },
   },
-  title: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  message: {
-    type: String,
-    required: true
-  },
-  type: {
-    type: String,
-    required: true,
-    // Enforces required notification features[cite: 2]
-    enum: ['Project Updates', 'Task Assignments', 'Procurement Alerts', 'Attendance Alerts', 'Deadline Notifications', 'System Notifications']
-  },
-  isRead: {
-    type: Boolean,
-    default: false
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  {
+    timestamps: true,
   }
-});
+);
 
 module.exports = mongoose.model('Notification', notificationSchema);
