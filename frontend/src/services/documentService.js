@@ -1,4 +1,5 @@
 import api from './api';
+import { createNotification } from './notificationService';
 
 const STORAGE_KEY = 'buildtrack_documents';
 
@@ -117,6 +118,17 @@ export const uploadDocument = async (docData) => {
   const current = getStoredDocuments();
   const updated = [newDoc, ...current];
   setStoredDocuments(updated);
+
+  try {
+    await createNotification({
+      title: 'Document Uploaded to Vault',
+      message: `File "${newDoc.fileName}" (${newDoc.category}) was added to ${newDoc.projectName}.`,
+      type: 'System Notifications'
+    });
+  } catch (e) {
+    console.error('Notification failed:', e);
+  }
+
   return newDoc;
 };
 

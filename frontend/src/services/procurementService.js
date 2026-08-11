@@ -1,5 +1,6 @@
 import { procurementData } from '../mocks/procurementData';
 import { addInventoryItem } from './inventoryService';
+import { createNotification } from './notificationService';
 
 const STORAGE_KEY = 'buildtrack_procurement';
 
@@ -44,7 +45,7 @@ export const getAllProcurements = () => {
  */
 export const createPurchaseOrder = (orderData) => {
   return new Promise((resolve) => {
-    setTimeout(() => {
+    setTimeout(async () => {
       const newOrder = {
         _id: `PO-${Date.now()}`,
         status: 'Pending Approval',
@@ -59,6 +60,17 @@ export const createPurchaseOrder = (orderData) => {
 
       // Keep mock array updated
       procurementData.unshift(newOrder);
+
+      // Trigger automatic system notification
+      try {
+        await createNotification({
+          title: 'Purchase Order Submitted',
+          message: `PO ${newOrder._id} for ${newOrder.itemName} was created and submitted for approval.`,
+          type: 'Procurement Alerts'
+        });
+      } catch (e) {
+        console.error('Notification creation failed:', e);
+      }
 
       resolve(newOrder);
     }, 500);
@@ -87,6 +99,17 @@ export const updateOrderStatus = (orderId, newStatus) => {
         }
 
         const updatedOrder = all[index];
+
+        // Trigger automatic system notification
+        try {
+          await createNotification({
+            title: `Order Status: ${newStatus}`,
+            message: `Purchase Order ${updatedOrder._id} (${updatedOrder.itemName}) status changed to "${newStatus}".`,
+            type: 'Procurement Alerts'
+          });
+        } catch (e) {
+          console.error('Notification creation failed:', e);
+        }
 
         // Auto-sync with Inventory Service if marked as Delivered
         if (newStatus === 'Delivered') {

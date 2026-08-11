@@ -1,4 +1,5 @@
 import api from './api';
+import { createNotification } from './notificationService';
 
 const STORAGE_KEY = 'buildtrack_reports';
 
@@ -105,6 +106,17 @@ export const generateReport = async (reportData) => {
   const current = getStoredReports();
   const updated = [newReport, ...current];
   setStoredReports(updated);
+
+  try {
+    await createNotification({
+      title: 'New Audit Report Generated',
+      message: `Report "${newReport.title}" (${newReport.reportType}) generated for ${newReport.projectName}.`,
+      type: 'System Notifications'
+    });
+  } catch (e) {
+    console.error('Notification failed:', e);
+  }
+
   return newReport;
 };
 
