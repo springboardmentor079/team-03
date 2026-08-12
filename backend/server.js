@@ -2,6 +2,7 @@ require('dotenv').config({ quiet: true });
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 
 // Import routes
 const userRoutes = require('./routes/user.routes');
@@ -14,9 +15,16 @@ const workforceRoutes = require('./routes/workforce.routes');
 const procurementRoutes = require('./routes/procurement.routes');
 const vendorRoutes = require('./routes/vendor.routes');
 const invoiceRoutes = require('./routes/invoice.routes');
+<<<<<<< HEAD
 const expenseRoutes = require('./routes/expense.routes');
 
 
+=======
+const notificationRoutes = require('./routes/notification.routes'); // ← added
+const reportRoutes = require('./routes/report.routes'); // ← added
+const documentRoutes = require('./routes/document.routes'); // ← added
+ 
+>>>>>>> dd92a1c (notification comtroller and routes)
 
    // ← added
 
@@ -43,6 +51,10 @@ app.use('/api/procurements', procurementRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/expenses', expenseRoutes);
+
+app.use('/api/notifications', notificationRoutes); // ← added
+app.use('/api/reports', reportRoutes); // ← added
+app.use('/api/documents', documentRoutes); // ← added
 
 // MongoDB Connection and Server Start
 const PORT = process.env.PORT || 5000;
