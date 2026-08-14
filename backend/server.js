@@ -15,18 +15,10 @@ const workforceRoutes = require('./routes/workforce.routes');
 const procurementRoutes = require('./routes/procurement.routes');
 const vendorRoutes = require('./routes/vendor.routes');
 const invoiceRoutes = require('./routes/invoice.routes');
-<<<<<<< HEAD
 const expenseRoutes = require('./routes/expense.routes');
-
-
-=======
-const notificationRoutes = require('./routes/notification.routes'); // ← added
-const reportRoutes = require('./routes/report.routes'); // ← added
-const documentRoutes = require('./routes/document.routes'); // ← added
- 
->>>>>>> dd92a1c (notification comtroller and routes)
-
-   // ← added
+const notificationRoutes = require('./routes/notification.routes');
+const reportRoutes = require('./routes/report.routes');
+const documentRoutes = require('./routes/document.routes');
 
 const app = express();
 

@@ -7,9 +7,7 @@ export const procurementData = [
     quantity: 150,
     estimatedCost: 8500,
     procurementCategory: "Raw Materials",
-    status: "Pending Approval",
-    createdBy: "Alex Engineer",
-    createdByRole: "Site Engineer"
+    status: "Pending Approval"
   },
   {
     _id: "PO-1002",
@@ -19,9 +17,7 @@ export const procurementData = [
     quantity: 1,
     estimatedCost: 4500,
     procurementCategory: "Equipment",
-    status: "Pending Approval",
-    createdBy: "Sarah Connor",
-    createdByRole: "Project Manager"
+    status: "Pending Approval"
   },
   {
     _id: "PO-1003",
@@ -31,9 +27,7 @@ export const procurementData = [
     quantity: 2,
     estimatedCost: 12000,
     procurementCategory: "Machinery",
-    status: "Pending Approval",
-    createdBy: "Alex Engineer",
-    createdByRole: "Site Engineer"
+    status: "Pending Approval"
   },
   {
     _id: "PO-1004",
@@ -43,8 +37,6 @@ export const procurementData = [
     quantity: 80,
     estimatedCost: 1600,
     procurementCategory: "Safety Equipment",
-    status: "Pending Approval",
-    createdBy: "John Contractor",
-    createdByRole: "Contractor"
+    status: "Pending Approval"
   }
 ];
