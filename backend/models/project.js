@@ -49,6 +49,21 @@ const projectSchema = new mongoose.Schema(
     status: {
         type: String,
         default: "Planning"
+    },
+
+    siteAddress: {
+        type: String,
+        default: "123 Construction Site Way"
+    },
+
+    latitude: {
+        type: Number,
+        default: 37.7749
+    },
+
+    longitude: {
+        type: Number,
+        default: -122.4194
     }
 
 },

@@ -1,16 +1,45 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
 const PasswordReset = () => {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
+
   const [email, setEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (token) {
+      if (!newPassword || newPassword.length < 6) {
+        setError('New password must be at least 6 characters long.');
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setError('Passwords do not match.');
+        return;
+      }
+
+      setIsSubmitting(true);
+      try {
+        const res = await axios.post(`http://localhost:5000/api/auth/reset-password/${token}`, { password: newPassword });
+        setIsSuccess(true);
+        setSuccessMsg(res.data?.message || 'Password has been reset successfully!');
+      } catch (err) {
+        setError(err.response?.data?.message || 'Failed to reset password. Token may be invalid or expired.');
+      } finally {
+        setIsSubmitting(false);
+      }
+      return;
+    }
 
     // Basic email validation
     if (!email) {
@@ -27,6 +56,7 @@ const PasswordReset = () => {
     try {
       await axios.post('http://localhost:5000/api/auth/forgot-password', { email });
       setIsSuccess(true);
+      setSuccessMsg(`A security password recovery link has been dispatched to ${email}.`);
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
@@ -72,9 +102,11 @@ const PasswordReset = () => {
               ✓
             </div>
             
-            <h3 style={{ fontSize: '20px', fontWeight: 'bold', margin: '0 0 12px 0' }}>Reset Link Sent</h3>
+            <h3 style={{ fontSize: '20px', fontWeight: 'bold', margin: '0 0 12px 0' }}>
+              {token ? 'Password Updated!' : 'Reset Link Sent'}
+            </h3>
             <p style={{ color: '#a0a0a0', fontSize: '14px', lineHeight: '1.5', margin: '0 0 28px 0' }}>
-              A security password recovery link has been dispatched to <strong>{email}</strong>.
+              {successMsg || 'Operation completed successfully.'}
             </p>
 
             <Link
@@ -96,15 +128,17 @@ const PasswordReset = () => {
                 outline: 'none'
               }}
             >
-              Back to Login
+              Return to Login
             </Link>
           </div>
         ) : (
           // Request Form UI
           <div>
-            <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0', textAlign: 'center' }}>Reset Password</h2>
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 8px 0', textAlign: 'center' }}>
+              {token ? 'Set New Password' : 'Reset Password'}
+            </h2>
             <p style={{ color: '#a0a0a0', fontSize: '14px', margin: '0 0 28px 0', textAlign: 'center', lineHeight: '1.5' }}>
-              Provide your account email address to receive a recovery reset link.
+              {token ? 'Enter and confirm your new secure account password.' : 'Provide your account email address to receive a recovery reset link.'}
             </p>
 
             {error && (
@@ -122,27 +156,74 @@ const PasswordReset = () => {
             )}
 
             <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '13px', color: '#a0a0a0', marginBottom: '8px' }}>Email Address *</label>
-                <input
-                  type="text"
-                  placeholder="e.g. manager@buildtrack.com"
-                  value={email}
-                  disabled={isSubmitting}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={{
-                    width: '100%',
-                    backgroundColor: '#1e1e24',
-                    border: '1px solid #3a3a45',
-                    borderRadius: '6px',
-                    padding: '12px 14px',
-                    color: '#ffffff',
-                    outline: 'none',
-                    fontSize: '14px',
-                    opacity: isSubmitting ? 0.7 : 1
-                  }}
-                />
-              </div>
+              {token ? (
+                <>
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', color: '#a0a0a0', marginBottom: '8px' }}>New Password *</label>
+                    <input
+                      type="password"
+                      placeholder="Minimum 6 characters"
+                      value={newPassword}
+                      disabled={isSubmitting}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#1e1e24',
+                        border: '1px solid #3a3a45',
+                        borderRadius: '6px',
+                        padding: '12px 14px',
+                        color: '#ffffff',
+                        outline: 'none',
+                        fontSize: '14px',
+                        opacity: isSubmitting ? 0.7 : 1
+                      }}
+                    />
+                  </div>
+                  <div style={{ marginBottom: '24px' }}>
+                    <label style={{ display: 'block', fontSize: '13px', color: '#a0a0a0', marginBottom: '8px' }}>Confirm Password *</label>
+                    <input
+                      type="password"
+                      placeholder="Re-enter password"
+                      value={confirmPassword}
+                      disabled={isSubmitting}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      style={{
+                        width: '100%',
+                        backgroundColor: '#1e1e24',
+                        border: '1px solid #3a3a45',
+                        borderRadius: '6px',
+                        padding: '12px 14px',
+                        color: '#ffffff',
+                        outline: 'none',
+                        fontSize: '14px',
+                        opacity: isSubmitting ? 0.7 : 1
+                      }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <div style={{ marginBottom: '24px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', color: '#a0a0a0', marginBottom: '8px' }}>Email Address *</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. manager@buildtrack.com"
+                    value={email}
+                    disabled={isSubmitting}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{
+                      width: '100%',
+                      backgroundColor: '#1e1e24',
+                      border: '1px solid #3a3a45',
+                      borderRadius: '6px',
+                      padding: '12px 14px',
+                      color: '#ffffff',
+                      outline: 'none',
+                      fontSize: '14px',
+                      opacity: isSubmitting ? 0.7 : 1
+                    }}
+                  />
+                </div>
+              )}
 
               <button
                 type="submit"
@@ -161,7 +242,7 @@ const PasswordReset = () => {
                   outline: 'none'
                 }}
               >
-                {isSubmitting ? 'Sending Link...' : 'Send Recovery Link'}
+                {isSubmitting ? (token ? 'Updating...' : 'Sending Link...') : (token ? 'Update Password' : 'Send Recovery Link')}
               </button>
 
               <div style={{ marginTop: '20px', textAlign: 'center' }}>

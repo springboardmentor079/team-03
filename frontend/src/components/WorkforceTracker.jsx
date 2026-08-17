@@ -157,7 +157,20 @@ const WorkforceTracker = ({ projectId }) => {
               />
             </div>
 
-            <div className="col-12 col-md-3">
+            <div className="col-12 col-md-2">
+              <label className="form-label small fw-semibold text-dark mb-1">Shift *</label>
+              <select
+                className="form-select form-select-sm"
+                value={formData.shift || 'Morning'}
+                onChange={(e) => setFormData({ ...formData, shift: e.target.value })}
+              >
+                <option value="Morning">Morning (8am-4pm)</option>
+                <option value="Evening">Evening (4pm-12am)</option>
+                <option value="Night">Night (12am-8am)</option>
+              </select>
+            </div>
+
+            <div className="col-12 col-md-2">
               <label className="form-label small fw-semibold text-dark mb-1">Task Description *</label>
               <input
                 type="text"

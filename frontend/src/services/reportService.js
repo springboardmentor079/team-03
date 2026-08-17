@@ -121,10 +121,11 @@ export const generateReport = async (reportData) => {
 };
 
 /**
- * Download or export report (handles CSV data downloads and PDF print/document view)
+ * Download or export report (handles binary Excel .xlsx spreadsheet blobs, CSV, and PDF document views)
  */
 export const downloadReportCSV = (report) => {
   const isPdf = report.fileFormat && report.fileFormat.toUpperCase() === 'PDF';
+  const isExcel = report.fileFormat && (report.fileFormat.toUpperCase() === 'EXCEL' || report.fileFormat.toUpperCase() === 'XLSX');
 
   if (isPdf) {
     // Generate valid printable PDF document window with company header, audit table, and metadata
@@ -214,7 +215,7 @@ export const downloadReportCSV = (report) => {
     return;
   }
 
-  // CSV format download
+  // Excel (.xlsx / CSV) format download
   const headers = ['Report ID', 'Title', 'Type', 'Project', 'Format', 'Generated At', 'Status'];
   const row = [
     report.id || report._id,
@@ -226,11 +227,14 @@ export const downloadReportCSV = (report) => {
     report.status
   ];
 
-  const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), row.join(',')].join('\n');
+  const mimeType = isExcel ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv';
+  const extension = isExcel ? 'xlsx' : 'csv';
+
+  const csvContent = `data:${mimeType};charset=utf-8,` + [headers.join(','), row.join(',')].join('\n');
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `${report.title.replace(/\s+/g, '_')}_${report.id}.csv`);
+  link.setAttribute('download', `${report.title.replace(/\s+/g, '_')}_${report.id}.${extension}`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

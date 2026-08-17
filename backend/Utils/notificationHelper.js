@@ -1,4 +1,7 @@
 const Notification = require('../models/Notification');
+const User = require('../models/user');
+const { sendEmail } = require('./emailService');
+const { sendSMS } = require('./smsService');
 
 /**
  * Create a notification. Use this from ANY other controller to trigger
@@ -27,6 +30,28 @@ const createNotification = async ({ recipient, sender, type = 'INFO', message, l
       message,
       linkUrl,
     });
+
+    // Trigger Email & SMS dispatches for high-priority types
+    if (['WARNING', 'ALERT', 'DOCUMENT_UPLOADED'].includes(type)) {
+      try {
+        const userObj = await User.findById(recipient).select('email phone fullName');
+        if (userObj && userObj.email) {
+          sendEmail({
+            to: userObj.email,
+            subject: `[BuildTrack ${type}] Notification Update`,
+            text: `Hello ${userObj.fullName || 'User'},\n\n${message}\n\nAccess BuildTrack: ${linkUrl || '#'}`
+          });
+        }
+        if (userObj && userObj.phone) {
+          sendSMS({
+            to: userObj.phone,
+            message: `BuildTrack ${type}: ${message}`
+          });
+        }
+      } catch (err) {
+        console.error('Email/SMS dispatch secondary error:', err.message);
+      }
+    }
 
     return notification;
   } catch (error) {

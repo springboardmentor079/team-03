@@ -31,6 +31,15 @@ const workforceSchema = new mongoose.Schema({
     enum: ['Active', 'On Leave', 'Terminated'],
     default: 'Active'
   },
+  shift: {
+    type: String,
+    enum: ['Morning', 'Evening', 'Night'],
+    default: 'Morning'
+  },
+  shiftHours: {
+    type: String,
+    default: '08:00 AM - 04:00 PM'
+  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User' // Optional link to a registered platform user

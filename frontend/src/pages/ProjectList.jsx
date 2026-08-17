@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getProjects, updateProject, deleteProject } from '../services/projectService';
 import DeleteConfirmationModal from '../components/DeleteConfirmationModal';
+import SiteMapViewer from '../components/SiteMapViewer';
 
 const ProjectList = () => {
   const [projects, setProjects] = useState([]);
@@ -238,7 +239,9 @@ const ProjectList = () => {
           </Link>
         </div>
       ) : (
-        <div className="row g-4">
+        <>
+          <SiteMapViewer projects={projects} />
+          <div className="row g-4">
           {projects.map((project) => (
             <div className="col-12 col-md-6 col-lg-4" key={project._id}>
               <div className="card h-100 shadow-sm project-card-hover bg-white">
@@ -381,6 +384,7 @@ const ProjectList = () => {
             </div>
           ))}
         </div>
+        </>
       )}
 
       {/* Edit Project Modal */}

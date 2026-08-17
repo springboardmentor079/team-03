@@ -189,6 +189,43 @@ const ResourceAllocation = ({ projectId }) => {
             </table>
           </div>
         )}
+        {/* Equipment Maintenance Scheduling Section */}
+        <div className="mt-4 pt-4 border-top">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h6 className="fw-bold text-dark mb-0">🔧 Equipment & Machinery Maintenance Schedule</h6>
+            <span className="badge bg-warning text-dark">Preventative Service Due</span>
+          </div>
+
+          <div className="row g-3">
+            {[
+              { name: 'CAT 320 Excavator', category: 'Heavy Machinery', status: 'Operational', lastService: '2026-07-15', nextService: '2026-08-30' },
+              { name: 'Tower Crane Alpha', category: 'Lifting Equipment', status: 'Under Maintenance', lastService: '2026-08-01', nextService: '2026-08-20' },
+              { name: 'JCB Backhoe Loader', category: 'Vehicle', status: 'Operational', lastService: '2026-06-20', nextService: '2026-09-01' }
+            ].map((item, i) => (
+              <div key={i} className="col-12 col-md-4">
+                <div className="p-3 border rounded-3 bg-light">
+                  <div className="d-flex justify-content-between align-items-start mb-2">
+                    <h6 className="fw-bold mb-0 text-dark">{item.name}</h6>
+                    <span className={`badge ${item.status === 'Operational' ? 'bg-success' : 'bg-danger'}`}>
+                      {item.status}
+                    </span>
+                  </div>
+                  <p className="small text-muted mb-2">{item.category}</p>
+                  <div className="small text-dark">
+                    <div><strong>Last Service:</strong> {item.lastService}</div>
+                    <div><strong>Next Due:</strong> <span className="text-primary fw-semibold">{item.nextService}</span></div>
+                  </div>
+                  <button
+                    onClick={() => alert(`Maintenance logged for ${item.name}`)}
+                    className="btn btn-sm btn-outline-dark w-100 mt-2 fw-semibold"
+                  >
+                    Schedule Service
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

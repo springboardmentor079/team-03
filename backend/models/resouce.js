@@ -21,6 +21,18 @@ const resourceSchema = new mongoose.Schema({
     enum: ['Available', 'In Use', 'Under Maintenance', 'Decommissioned'],
     default: 'Available',
     required: true
+  },
+  lastMaintenanceDate: {
+    type: Date,
+    default: null
+  },
+  nextMaintenanceDate: {
+    type: Date,
+    default: null
+  },
+  maintenanceNotes: {
+    type: String,
+    default: ''
   }
 }, { timestamps: true });
 
