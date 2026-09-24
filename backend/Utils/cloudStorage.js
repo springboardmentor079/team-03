@@ -2,6 +2,16 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
+let cloudinary, CloudinaryStorage;
+try {
+  cloudinary = require('cloudinary').v2;
+  const multerCloudinary = require('multer-storage-cloudinary');
+  CloudinaryStorage = multerCloudinary.CloudinaryStorage;
+} catch (e) {
+  cloudinary = null;
+  CloudinaryStorage = null;
+}
+
 // Ensure local uploads directory exists
 const uploadDir = path.join(__dirname, '../uploads/documents');
 if (!fs.existsSync(uploadDir)) {
@@ -19,9 +29,22 @@ const localStorage = multer.diskStorage({
   }
 });
 
+let storage = localStorage;
+
+if (cloudinary && process.env.CLOUDINARY_URL) {
+  storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+      folder: 'buildtrack/documents',
+      allowed_formats: ['jpg', 'png', 'pdf', 'docx', 'xlsx', 'txt'],
+      resource_type: 'auto'
+    },
+  });
+}
+
 // Configure Multer with max file size limit (10MB)
 const upload = multer({
-  storage: localStorage,
+  storage: storage,
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
@@ -39,3 +62,4 @@ const getPublicFileUrl = (file) => {
 };
 
 module.exports = { upload, getPublicFileUrl };
+

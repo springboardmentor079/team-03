@@ -1,4 +1,6 @@
 const Report = require('../models/Report');
+const PDFDocument = require('pdfkit');
+const ExcelJS = require('exceljs');
 
 /**
  * =====================================================================
@@ -215,5 +217,84 @@ exports.deleteReport = async (req, res) => {
     res.status(200).json({ message: 'Report deleted' });
   } catch (error) {
     res.status(500).json({ message: 'Failed to delete report', error: error.message });
+  }
+};
+
+// @desc    Export a report as PDF
+// @route   GET /api/reports/:id/export/pdf
+// @access  Private
+exports.exportReportPdf = async (req, res) => {
+  try {
+    const report = await Report.findById(req.params.id).populate('project', 'name');
+    if (!report) {
+      return res.status(404).json({ message: 'Report not found' });
+    }
+
+    const doc = new PDFDocument();
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=report-${report._id}.pdf`);
+    doc.pipe(res);
+
+    doc.fontSize(20).text(`Report: ${report.title}`, { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(14).text(`Type: ${report.reportType}`);
+    doc.text(`Project: ${report.project ? report.project.name : 'N/A'}`);
+    doc.text(`Generated At: ${new Date(report.createdAt).toLocaleString()}`);
+    doc.moveDown();
+    
+    doc.fontSize(16).text('Metrics:');
+    doc.fontSize(12);
+    if (report.parameters) {
+      doc.text(JSON.stringify(report.parameters, null, 2));
+    } else {
+      doc.text('No metrics available.');
+    }
+
+    doc.end();
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to export PDF', error: error.message });
+  }
+};
+
+// @desc    Export a report as Excel
+// @route   GET /api/reports/:id/export/excel
+// @access  Private
+exports.exportReportExcel = async (req, res) => {
+  try {
+    const report = await Report.findById(req.params.id).populate('project', 'name');
+    if (!report) {
+      return res.status(404).json({ message: 'Report not found' });
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Report Data');
+
+    worksheet.columns = [
+      { header: 'Property', key: 'property', width: 30 },
+      { header: 'Value', key: 'value', width: 50 },
+    ];
+
+    worksheet.addRow({ property: 'Title', value: report.title });
+    worksheet.addRow({ property: 'Type', value: report.reportType });
+    worksheet.addRow({ property: 'Project', value: report.project ? report.project.name : 'N/A' });
+    worksheet.addRow({ property: 'Generated At', value: new Date(report.createdAt).toLocaleString() });
+    
+    if (report.parameters) {
+      Object.keys(report.parameters).forEach(key => {
+        let val = report.parameters[key];
+        if (typeof val === 'object') {
+          val = JSON.stringify(val);
+        }
+        worksheet.addRow({ property: `Metric: ${key}`, value: val });
+      });
+    }
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename=report-${report._id}.xlsx`);
+    
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to export Excel', error: error.message });
   }
 };
